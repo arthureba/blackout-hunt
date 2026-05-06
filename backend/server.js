@@ -3,17 +3,31 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const fs = require('fs');
 
 const scanRouter = require('./routes/scan');
 const rankingRouter = require('./routes/ranking');
 const adminRouter = require('./routes/admin');
+const db = require('./db');
+
+async function initDb() {
+  try {
+    const schema = fs.readFileSync(path.join(__dirname, '..', 'schema.sql'), 'utf8');
+    await db.query(schema);
+    console.log('Database schema initialized');
+  } catch (err) {
+    console.error('DB init error:', err.message);
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // CORS
-const corsOrigin =
-  process.env.NODE_ENV === 'production' ? 'https://blackouthunt.com.br' : true;
+const corsOrigins = ['https://blackouthunt.com.br', 'https://www.blackouthunt.com.br'];
+const corsOrigin = process.env.NODE_ENV === 'production'
+  ? (origin, cb) => (!origin || corsOrigins.includes(origin) ? cb(null, true) : cb(new Error('CORS')))
+  : true;
 app.use(cors({ origin: corsOrigin }));
 
 app.use(express.json());
@@ -51,7 +65,9 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`BLACKOUT HUNT server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+initDb().then(() => {
+  app.listen(PORT, () => {
+    console.log(`BLACKOUT HUNT server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
 });
