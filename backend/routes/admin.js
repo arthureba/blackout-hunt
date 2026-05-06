@@ -92,6 +92,18 @@ router.post('/init-db', async (req, res) => {
   }
 });
 
+router.post('/reset-all', async (req, res) => {
+  try {
+    await db.query('UPDATE system_state SET winner_user_id = NULL WHERE id = 1');
+    await db.query('UPDATE qr_codes SET is_active = FALSE, activated_at = NULL');
+    await db.query('DELETE FROM users');
+    return res.json({ ok: true, message: 'Todos os dados resetados' });
+  } catch (err) {
+    console.error('Reset all error:', err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 router.post('/reset-winner', async (req, res) => {
   try {
     await db.query('UPDATE system_state SET winner_user_id = NULL WHERE id = 1');
