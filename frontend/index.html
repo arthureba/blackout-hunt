@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLACKOUT HUNT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --neon: #ff2d55;
+      --orange: #ff6b00;
+      --gold: #ffd700;
+      --silver: #c0c0c0;
+      --bronze: #cd7f32;
+      --bg: #0a0a0a;
+      --bg2: #111111;
+      --bg3: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #e0e0e0;
+      --muted: #666;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* HEADER */
+    header {
+      text-align: center;
+      padding: 2rem 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 10vw, 6rem);
+      letter-spacing: 0.08em;
+      background: linear-gradient(135deg, var(--neon), var(--orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 20px rgba(255, 45, 85, 0.5));
+      animation: logoPulse 3s ease-in-out infinite;
+      line-height: 1;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 45, 85, 0.5)); }
+      50% { filter: drop-shadow(0 0 35px rgba(255, 45, 85, 0.9)); }
+    }
+
+    .tagline {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-top: 0.5rem;
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    /* STEP BANNER */
+    .step-banner {
+      background: linear-gradient(135deg, rgba(255,45,85,0.15), rgba(255,107,0,0.1));
+      border: 1px solid var(--neon);
+      border-radius: 4px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .step-badge {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      color: var(--neon);
+      line-height: 1;
+      min-width: 2rem;
+    }
+
+    .step-info h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+
+    .step-info p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    /* ADMIN PANEL */
+    #adminPanel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    #adminPanel h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      color: var(--orange);
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+
+    .admin-secret-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .admin-secret-row input {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.6rem 0.8rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      border-radius: 4px;
+    }
+
+    .admin-secret-row input:focus {
+      outline: none;
+      border-color: var(--orange);
+    }
+
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .qr-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .qr-card .qr-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: var(--text);
+    }
+
+    .qr-card .qr-status {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin: 0.3rem 0;
+    }
+
+    .qr-card.active { border-color: #00ff88; }
+    .qr-card.active .qr-status { color: #00ff88; }
+    .qr-card.inactive .qr-status { color: var(--muted); }
+
+    .qr-card .qr-time {
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      min-height: 1em;
+    }
+
+    .admin-btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* BUTTONS */
+    .btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--neon);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) { background: #e0264b; }
+
+    .btn-secondary {
+      background: var(--bg3);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) { border-color: var(--muted); }
+
+    .btn-orange {
+      background: var(--orange);
+      color: #fff;
+    }
+
+    .btn-orange:hover:not(:disabled) { background: #e05f00; }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--neon);
+      border: 1px solid var(--neon);
+    }
+
+    .btn-danger:hover:not(:disabled) { background: rgba(255,45,85,0.1); }
+
+    .btn-full { width: 100%; padding: 0.9rem; font-size: 1rem; }
+
+    /* FORM */
+    .form-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-card h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 500px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    .form-group {
+      margin-bottom: 0.75rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.7rem 0.9rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.9rem;
+      border-radius: 4px;
+      transition: border-color 0.15s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--neon);
+    }
+
+    /* RESULT PANEL */
+    #resultPanel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .result-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+    }
+
+    .result-title.success { color: #00ff88; }
+    .result-title.duplicate { color: var(--orange); }
+    .result-title.winner { color: var(--gold); }
+
+    .result-subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* PROGRESS BAR */
+    .progress-bar {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .progress-seg {
+      flex: 1;
+      height: 8px;
+      background: var(--bg3);
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      transition: background 0.3s ease;
+    }
+
+    .progress-seg.done { background: var(--neon); border-color: var(--neon); }
+
+    /* QR TIMES GRID */
+    .qr-times-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 500px) {
+      .qr-times-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .qr-time-cell {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.6rem;
+      text-align: center;
+    }
+
+    .qr-time-cell .qr-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .qr-time-cell .qr-val {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-top: 0.2rem;
+      color: var(--text);
+    }
+
+    .qr-time-cell.done { border-color: var(--neon); }
+    .qr-time-cell.done .qr-val { color: var(--neon); }
+
+    .total-time-box {
+      background: linear-gradient(135deg, rgba(255,45,85,0.1), rgba(255,107,0,0.08));
+      border: 1px solid var(--neon);
+      border-radius: 4px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .total-time-box .label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .total-time-box .value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      color: var(--neon);
+      letter-spacing: 0.05em;
+    }
+
+    /* WINNER CARD */
+    .winner-card {
+      background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,107,0,0.1));
+      border: 2px solid var(--gold);
+      border-radius: 4px;
+      padding: 1.5rem;
+      text-align: center;
+      animation: winnerPulse 2s ease-in-out infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes winnerPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+      50% { box-shadow: 0 0 40px rgba(255,215,0,0.7); }
+    }
+
+    .winner-card h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+    }
+
+    .winner-card p {
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-top: 0.5rem;
+    }
+
+    /* RANKING */
+    .ranking-section {
+      margin-top: 2rem;
+    }
+
+    .ranking-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .ranking-header h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+
+    .refresh-info {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .countdown-bar {
+      height: 2px;
+      background: var(--bg3);
+      border-radius: 1px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .countdown-fill {
+      height: 100%;
+      background: var(--neon);
+      border-radius: 1px;
+      transition: width 1s linear;
+    }
+
+    .ranking-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .ranking-table th {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ranking-table td {
+      padding: 0.7rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      vertical-align: middle;
+    }
+
+    .ranking-table tr:last-child td { border-bottom: none; }
+
+    .rank-pos {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      width: 2rem;
+      text-align: center;
+    }
+
+    .rank-1 .rank-pos { color: var(--gold); }
+    .rank-2 .rank-pos { color: var(--silver); }
+    .rank-3 .rank-pos { color: var(--bronze); }
+
+    .rank-1 td { background: rgba(255,215,0,0.04); }
+    .rank-2 td { background: rgba(192,192,192,0.03); }
+    .rank-3 td { background: rgba(205,127,50,0.03); }
+
+    .rank-winner td { background: rgba(255,215,0,0.08); }
+
+    .rank-me td { background: rgba(255,45,85,0.07); }
+
+    .rank-name {
+      font-weight: 700;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rank-insta {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .rank-pips {
+      display: flex;
+      gap: 3px;
+    }
+
+    .pip {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .pip.done { background: var(--neon); border-color: var(--neon); }
+    .pip.done-4 { background: var(--gold); border-color: var(--gold); }
+
+    .rank-time {
+      font-weight: 700;
+      font-size: 0.85rem;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .badge-winner {
+      display: inline-block;
+      background: var(--gold);
+      color: #000;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.15rem 0.4rem;
+      border-radius: 2px;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }
+
+    .badge-me {
+      display: inline-block;
+      background: var(--neon);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.15rem 0.4rem;
+      border-radius: 2px;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }
+
+    .ranking-empty {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* TOAST */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-width: 320px;
+    }
+
+    .toast {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--neon);
+      border-radius: 4px;
+      padding: 0.8rem 1rem;
+      font-size: 0.8rem;
+      animation: toastIn 0.3s ease;
+      word-break: break-word;
+    }
+
+    .toast.error { border-left-color: var(--neon); }
+    .toast.success { border-left-color: #00ff88; }
+    .toast.info { border-left-color: var(--orange); }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; }
+      to { opacity: 0; transform: translateX(20px); }
+    }
+
+    /* MISC */
+    .hidden { display: none !important; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+
+    .text-muted { color: var(--muted); font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">BLACKOUT HUNT</div>
+  <div class="tagline">Caça ao Tesouro · Ao Vivo</div>
+</header>
+
+<div class="container">
+
+  <!-- STEP BANNER -->
+  <div id="stepBanner" class="step-banner hidden">
+    <div class="step-badge" id="stepBadgeNum">?</div>
+    <div class="step-info">
+      <h2 id="stepBannerTitle">CHECKPOINT</h2>
+      <p id="stepBannerSub">Preencha seus dados e registre sua chegada</p>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" class="hidden">
+    <h2>⚙ PAINEL ADMIN</h2>
+    <div class="admin-secret-row">
+      <input type="password" id="adminSecret" placeholder="Admin Secret" />
+      <button class="btn btn-orange" onclick="adminFetchStatus()">Verificar</button>
+    </div>
+
+    <div class="qr-grid" id="qrCards">
+      <!-- filled by JS -->
+    </div>
+
+    <div class="admin-btn-row">
+      <button class="btn btn-secondary" onclick="adminFetchStatus()">↻ Status</button>
+      <button class="btn btn-danger" onclick="adminResetWinner()">Reset Vencedor</button>
+    </div>
+
+    <div id="adminUserCount" class="text-muted"></div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card" id="formCard">
+    <h2>REGISTRAR CHECKPOINT</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome Completo *</label>
+        <input type="text" id="fName" placeholder="Seu nome" autocomplete="name" />
+      </div>
+      <div class="form-group">
+        <label>Instagram</label>
+        <input type="text" id="fInsta" placeholder="@handle" autocomplete="off" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="fEmail" placeholder="seu@email.com" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label>Telefone *</label>
+        <input type="tel" id="fPhone" placeholder="+55 11 99999-9999" autocomplete="tel" />
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" id="btnScan" onclick="doScan()">
+      REGISTRAR CHECKPOINT
+    </button>
+  </div>
+
+  <!-- RESULT PANEL -->
+  <div id="resultPanel">
+    <div id="winnerCard" class="winner-card hidden">
+      <h2>🏆 VOCÊ É O VENCEDOR!</h2>
+      <p>Parabéns! Você foi o primeiro a completar todos os checkpoints!</p>
+    </div>
+
+    <div id="alreadyClaimedCard" class="winner-card hidden" style="border-color: var(--orange); animation: none; box-shadow: none;">
+      <h2 style="color: var(--orange);">⏱ JÁ TEM UM VENCEDOR</h2>
+      <p>Você chegou tarde, mas sua performance está no ranking!</p>
+    </div>
+
+    <div class="result-header">
+      <div class="result-icon" id="resultIcon">✓</div>
+      <div>
+        <div class="result-title" id="resultTitle">CHECKPOINT REGISTRADO</div>
+        <div class="result-subtitle" id="resultSubtitle"></div>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-seg" id="seg1"></div>
+      <div class="progress-seg" id="seg2"></div>
+      <div class="progress-seg" id="seg3"></div>
+      <div class="progress-seg" id="seg4"></div>
+    </div>
+
+    <div class="qr-times-grid">
+      <div class="qr-time-cell" id="timeCell1">
+        <div class="qr-label">QR 1</div>
+        <div class="qr-val" id="timeVal1">—</div>
+      </div>
+      <div class="qr-time-cell" id="timeCell2">
+        <div class="qr-label">QR 2</div>
+        <div class="qr-val" id="timeVal2">—</div>
+      </div>
+      <div class="qr-time-cell" id="timeCell3">
+        <div class="qr-label">QR 3</div>
+        <div class="qr-val" id="timeVal3">—</div>
+      </div>
+      <div class="qr-time-cell" id="timeCell4">
+        <div class="qr-label">QR 4</div>
+        <div class="qr-val" id="timeVal4">—</div>
+      </div>
+    </div>
+
+    <div class="total-time-box">
+      <div class="label">Tempo Total Acumulado</div>
+      <div class="value" id="resultTotalTime">—</div>
+      <div class="text-muted" id="resultQrCount"></div>
+    </div>
+  </div>
+
+  <!-- RANKING -->
+  <div class="ranking-section">
+    <div class="ranking-header">
+      <h2>RANKING AO VIVO</h2>
+      <div class="refresh-info">
+        <div id="refreshCountdown">Atualizando em 60s</div>
+        <button class="btn btn-secondary" style="margin-top:0.3rem; padding:0.3rem 0.7rem; font-size:0.7rem;" onclick="loadRanking(true)">↻ Agora</button>
+      </div>
+    </div>
+
+    <div class="countdown-bar">
+      <div class="countdown-fill" id="countdownFill" style="width:100%"></div>
+    </div>
+
+    <div id="rankingContainer">
+      <div class="ranking-empty">Carregando ranking...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const API_BASE = '';
+const REFRESH_INTERVAL = 60;
+
+let currentStep = null;
+let refreshTimer = null;
+let countdownSeconds = REFRESH_INTERVAL;
+let countdownInterval = null;
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+(function init() {
+  const params = new URLSearchParams(window.location.search);
+  const stepParam = parseInt(params.get('step'), 10);
+  const isAdmin = params.get('admin') === '1';
+
+  if (stepParam >= 1 && stepParam <= 4) {
+    currentStep = stepParam;
+    showStepBanner(stepParam);
+  }
+
+  if (isAdmin) {
+    document.getElementById('adminPanel').classList.remove('hidden');
+    adminFetchStatus();
+  }
+
+  // Load saved user data
+  loadSavedUser();
+
+  // Start ranking
+  loadRanking();
+  startCountdown();
+})();
+
+// ─── Step Banner ──────────────────────────────────────────────────────────────
+function showStepBanner(step) {
+  const banner = document.getElementById('stepBanner');
+  banner.classList.remove('hidden');
+  document.getElementById('stepBadgeNum').textContent = step;
+  document.getElementById('stepBannerTitle').textContent =
+    step === 4 ? 'CHECKPOINT FINAL' : `CHECKPOINT ${step}`;
+  document.getElementById('stepBannerSub').textContent =
+    step === 4
+      ? 'Última etapa! Preencha seus dados para finalizar a caçada!'
+      : `Etapa ${step} de 4 — Preencha seus dados para registrar sua chegada`;
+}
+
+// ─── LocalStorage ─────────────────────────────────────────────────────────────
+function loadSavedUser() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('bh_user') || '{}');
+    if (saved.name) document.getElementById('fName').value = saved.name;
+    if (saved.email) document.getElementById('fEmail').value = saved.email;
+    if (saved.phone) document.getElementById('fPhone').value = saved.phone;
+    if (saved.instagram) document.getElementById('fInsta').value = saved.instagram;
+  } catch (_) {}
+}
+
+function saveUser(data) {
+  try {
+    localStorage.setItem('bh_user', JSON.stringify({
+      name: data.name,
+      email: document.getElementById('fEmail').value.trim(),
+      phone: document.getElementById('fPhone').value.trim(),
+      instagram: data.instagram,
+    }));
+    localStorage.setItem('bh_user_id', data.id);
+  } catch (_) {}
+}
+
+function getMyId() {
+  try { return localStorage.getItem('bh_user_id'); } catch (_) { return null; }
+}
+
+// ─── Scan ─────────────────────────────────────────────────────────────────────
+async function doScan() {
+  const name = document.getElementById('fName').value.trim();
+  const email = document.getElementById('fEmail').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  const instagram = document.getElementById('fInsta').value.trim();
+
+  if (!name || !email || !phone) {
+    showToast('Preencha nome, email e telefone', 'error');
+    return;
+  }
+
+  if (!currentStep) {
+    showToast('Escaneie um QR Code válido para registrar', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnScan');
+  btn.disabled = true;
+  btn.textContent = 'ENVIANDO...';
+
+  try {
+    const res = await fetch(`${API_BASE}/scan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ step: currentStep, name, email, phone, instagram }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.ok) {
+      showToast(data.error || 'Erro ao registrar checkpoint', 'error');
+      return;
+    }
+
+    saveUser(data.user);
+    showResult(data);
+    loadRanking(true);
+  } catch (err) {
+    showToast('Erro de conexão. Verifique sua internet.', 'error');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'REGISTRAR CHECKPOINT';
+  }
+}
+
+// ─── Show Result ──────────────────────────────────────────────────────────────
+function showResult(data) {
+  const panel = document.getElementById('resultPanel');
+  const { user, duplicate, winnerStatus, thisStep } = data;
+
+  // Winner cards
+  document.getElementById('winnerCard').classList.toggle('hidden', winnerStatus !== 'winner');
+  document.getElementById('alreadyClaimedCard').classList.toggle('hidden', winnerStatus !== 'already_claimed');
+
+  // Header
+  const icon = document.getElementById('resultIcon');
+  const title = document.getElementById('resultTitle');
+  const subtitle = document.getElementById('resultSubtitle');
+
+  if (duplicate) {
+    icon.textContent = '⟳';
+    title.textContent = 'JÁ REGISTRADO';
+    title.className = 'result-title duplicate';
+    subtitle.textContent = `Etapa ${thisStep.step} já foi contabilizada para você`;
+  } else if (winnerStatus === 'winner') {
+    icon.textContent = '🏆';
+    title.textContent = 'CHECKPOINT REGISTRADO';
+    title.className = 'result-title winner';
+    subtitle.textContent = `Etapa ${thisStep.step} · ${thisStep.time_formatted}`;
+  } else {
+    icon.textContent = '✓';
+    title.textContent = 'CHECKPOINT REGISTRADO';
+    title.className = 'result-title success';
+    subtitle.textContent = `Etapa ${thisStep.step} · ${thisStep.time_formatted}`;
+  }
+
+  // Progress segments
+  for (let i = 1; i <= 4; i++) {
+    const seg = document.getElementById(`seg${i}`);
+    seg.classList.toggle('done', user.progress[`qr${i}`]);
+  }
+
+  // QR times
+  for (let i = 1; i <= 4; i++) {
+    const cell = document.getElementById(`timeCell${i}`);
+    const val = document.getElementById(`timeVal${i}`);
+    const t = user.qr_times[`qr${i}`];
+    val.textContent = t || '—';
+    cell.classList.toggle('done', t != null);
+  }
+
+  // Total
+  document.getElementById('resultTotalTime').textContent = user.total_time_formatted || '—';
+  document.getElementById('resultQrCount').textContent = `${user.completedCount} de 4 checkpoints completos`;
+
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─── Ranking ──────────────────────────────────────────────────────────────────
+async function loadRanking(resetTimer = false) {
+  try {
+    const res = await fetch(`${API_BASE}/ranking`);
+    const data = await res.json();
+    if (data.ok) renderRanking(data);
+  } catch (err) {
+    console.error('Ranking error:', err);
+  }
+
+  if (resetTimer) {
+    clearTimeout(refreshTimer);
+    countdownSeconds = REFRESH_INTERVAL;
+    scheduleNextRefresh();
+  }
+}
+
+function renderRanking(data) {
+  const container = document.getElementById('rankingContainer');
+  const myId = getMyId();
+
+  if (!data.ranking || data.ranking.length === 0) {
+    container.innerHTML = '<div class="ranking-empty">Nenhum participante ainda. Seja o primeiro!</div>';
+    return;
+  }
+
+  const rows = data.ranking.map((u) => {
+    const isWinner = u.is_winner;
+    const isMe = myId && u.id === myId;
+    const isTop = u.position <= 3;
+
+    let rowClass = '';
+    if (isMe) rowClass = 'rank-me';
+    else if (isWinner) rowClass = 'rank-winner';
+    else if (isTop) rowClass = `rank-${u.position}`;
+
+    const pips = [1, 2, 3, 4].map((i) => {
+      const done = u.total_qr >= i;
+      const isLast = u.total_qr === 4;
+      return `<div class="pip ${done ? (isLast ? 'done-4' : 'done') : ''}"></div>`;
+    }).join('');
+
+    const winnerBadge = isWinner ? '<span class="badge-winner">Winner</span>' : '';
+    const meBadge = isMe ? '<span class="badge-me">Você</span>' : '';
+
+    const posColor = u.position === 1 ? 'var(--gold)' : u.position === 2 ? 'var(--silver)' : u.position === 3 ? 'var(--bronze)' : 'var(--muted)';
+
+    return `
+      <tr class="${rowClass}">
+        <td class="rank-pos" style="color:${posColor}">${u.position}</td>
+        <td>
+          <div class="rank-name">${escapeHtml(u.name)}${winnerBadge}${meBadge}</div>
+          <div class="rank-insta">${u.instagram ? escapeHtml(u.instagram) : ''}</div>
+        </td>
+        <td><div class="rank-pips">${pips}</div></td>
+        <td class="rank-time" style="color:${isWinner ? 'var(--gold)' : 'var(--text)'}">
+          ${u.total_time_ms > 0 ? u.total_time_formatted : '—'}
+        </td>
+      </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <table class="ranking-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Participante</th>
+          <th>Progresso</th>
+          <th>Tempo</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ─── Countdown ────────────────────────────────────────────────────────────────
+function startCountdown() {
+  countdownSeconds = REFRESH_INTERVAL;
+  scheduleNextRefresh();
+
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    countdownSeconds--;
+    if (countdownSeconds < 0) countdownSeconds = 0;
+
+    const pct = (countdownSeconds / REFRESH_INTERVAL) * 100;
+    document.getElementById('countdownFill').style.width = pct + '%';
+    document.getElementById('refreshCountdown').textContent =
+      `Atualizando em ${countdownSeconds}s`;
+  }, 1000);
+}
+
+function scheduleNextRefresh() {
+  clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(async () => {
+    await loadRanking();
+    countdownSeconds = REFRESH_INTERVAL;
+  }, REFRESH_INTERVAL * 1000);
+}
+
+// ─── Admin ────────────────────────────────────────────────────────────────────
+function getAdminSecret() {
+  return document.getElementById('adminSecret').value.trim();
+}
+
+async function adminFetchStatus() {
+  const secret = getAdminSecret();
+  if (!secret) { showToast('Informe o admin secret', 'error'); return; }
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/status`, {
+      headers: { 'x-admin-secret': secret },
+    });
+    const data = await res.json();
+    if (!data.ok) { showToast(data.error || 'Erro', 'error'); return; }
+    renderAdminCards(data);
+  } catch (err) {
+    showToast('Erro de conexão', 'error');
+  }
+}
+
+function renderAdminCards(data) {
+  const grid = document.getElementById('qrCards');
+  const count = document.getElementById('adminUserCount');
+
+  count.textContent = `Total de participantes: ${data.total_users}${data.winner ? ' · Vencedor: ' + data.winner.name : ''}`;
+
+  grid.innerHTML = data.qr_codes.map((qr) => {
+    const active = qr.is_active;
+    const timeStr = qr.activated_at
+      ? new Date(qr.activated_at).toLocaleTimeString('pt-BR')
+      : '—';
+    return `
+      <div class="qr-card ${active ? 'active' : 'inactive'}">
+        <div class="qr-num">QR ${qr.step}</div>
+        <div class="qr-status">${active ? '● ATIVO' : '○ INATIVO'}</div>
+        <div class="qr-time">${active ? 'Ativado: ' + timeStr : 'Não ativado'}</div>
+        <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap;">
+          <button class="btn btn-primary" style="padding:0.4rem 0.7rem;font-size:0.7rem;"
+            onclick="adminActivate(${qr.step})">Ativar</button>
+          <button class="btn btn-secondary" style="padding:0.4rem 0.7rem;font-size:0.7rem;"
+            onclick="adminDeactivate(${qr.step})">Desativar</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function adminActivate(step) {
+  const secret = getAdminSecret();
+  if (!secret) { showToast('Informe o admin secret', 'error'); return; }
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/activate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': secret },
+      body: JSON.stringify({ step }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(`QR ${step} ativado!`, 'success');
+      adminFetchStatus();
+    } else {
+      showToast(data.error || 'Erro', 'error');
+    }
+  } catch (err) {
+    showToast('Erro de conexão', 'error');
+  }
+}
+
+async function adminDeactivate(step) {
+  const secret = getAdminSecret();
+  if (!secret) { showToast('Informe o admin secret', 'error'); return; }
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/deactivate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': secret },
+      body: JSON.stringify({ step }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(`QR ${step} desativado`, 'info');
+      adminFetchStatus();
+    } else {
+      showToast(data.error || 'Erro', 'error');
+    }
+  } catch (err) {
+    showToast('Erro de conexão', 'error');
+  }
+}
+
+async function adminResetWinner() {
+  const secret = getAdminSecret();
+  if (!secret) { showToast('Informe o admin secret', 'error'); return; }
+
+  if (!confirm('Tem certeza que deseja resetar o vencedor?')) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/reset-winner`, {
+      method: 'POST',
+      headers: { 'x-admin-secret': secret },
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast('Vencedor resetado!', 'success');
+      adminFetchStatus();
+      loadRanking(true);
+    } else {
+      showToast(data.error || 'Erro', 'error');
+    }
+  } catch (err) {
+    showToast('Erro de conexão', 'error');
+  }
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = 'toastOut 0.3s ease forwards';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+</script>
+</body>
+</html>

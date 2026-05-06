@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLACKOUT HUNT — QR Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --neon: #ff2d55;
+      --orange: #ff6b00;
+      --bg: #0a0a0a;
+      --bg2: #111111;
+      --bg3: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #e0e0e0;
+      --muted: #666;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 8vw, 4rem);
+      background: linear-gradient(135deg, var(--neon), var(--orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 15px rgba(255,45,85,0.5));
+    }
+
+    .subtitle {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-top: 0.4rem;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .config-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .config-card h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+      color: var(--orange);
+      margin-bottom: 1rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .input-row input {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.7rem 1rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.9rem;
+      border-radius: 4px;
+    }
+
+    .input-row input:focus {
+      outline: none;
+      border-color: var(--neon);
+    }
+
+    .btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.7rem 1.4rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: var(--neon);
+      color: #fff;
+      transition: background 0.15s;
+    }
+
+    .btn:hover { background: #e0264b; }
+
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .qr-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .qr-card:hover { border-color: var(--neon); }
+
+    .qr-card .step-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .qr-card .step-1 { color: var(--neon); }
+    .qr-card .step-2 { color: var(--orange); }
+    .qr-card .step-3 { color: #9b59b6; }
+    .qr-card .step-4 { color: #ffd700; }
+
+    .qr-card img {
+      display: block;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 1rem;
+      border-radius: 4px;
+      background: #fff;
+      padding: 6px;
+    }
+
+    .qr-url {
+      font-size: 0.65rem;
+      color: var(--muted);
+      word-break: break-all;
+      margin-bottom: 0.75rem;
+      line-height: 1.5;
+    }
+
+    .btn-print {
+      font-size: 0.7rem;
+      padding: 0.4rem 0.8rem;
+      background: var(--bg3);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: border-color 0.15s;
+    }
+
+    .btn-print:hover { border-color: var(--muted); }
+
+    .hint {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    @media print {
+      body { background: #fff; color: #000; padding: 1rem; }
+      header, .config-card, .hint { display: none; }
+      .qr-card { border: 1px solid #ccc; break-inside: avoid; }
+      .qr-card .step-label, .qr-url { color: #000; -webkit-text-fill-color: #000; }
+      .btn-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">BLACKOUT HUNT</div>
+  <div class="subtitle">Gerador de QR Codes</div>
+</header>
+
+<div class="container">
+
+  <div class="config-card">
+    <h2>CONFIGURAR DOMÍNIO</h2>
+    <div class="input-row">
+      <input type="url" id="baseUrl" value="https://blackouthunt.com.br" placeholder="https://blackouthunt.com.br" />
+      <button class="btn" onclick="generate()">Gerar QRs</button>
+    </div>
+  </div>
+
+  <div class="qr-grid" id="qrGrid">
+    <!-- filled by JS -->
+  </div>
+
+  <div class="hint">
+    Clique em "Imprimir QR" em cada card para imprimir individualmente.<br />
+    Ou use Ctrl+P / Cmd+P para imprimir todos de uma vez.<br />
+    Os QRs apontam para <strong id="hintUrl">https://blackouthunt.com.br</strong>
+  </div>
+
+</div>
+
+<script>
+  const QR_API = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=';
+  const STEPS = [
+    { step: 1, label: 'QR 1 — CHECKPOINT 1', cls: 'step-1' },
+    { step: 2, label: 'QR 2 — CHECKPOINT 2', cls: 'step-2' },
+    { step: 3, label: 'QR 3 — CHECKPOINT 3', cls: 'step-3' },
+    { step: 4, label: 'QR 4 — FINAL',        cls: 'step-4' },
+  ];
+
+  function generate() {
+    const base = document.getElementById('baseUrl').value.trim().replace(/\/$/, '');
+    if (!base) return;
+
+    document.getElementById('hintUrl').textContent = base;
+
+    const grid = document.getElementById('qrGrid');
+    grid.innerHTML = STEPS.map(({ step, label, cls }) => {
+      const url = `${base}/?step=${step}`;
+      const qrSrc = QR_API + encodeURIComponent(url);
+      return `
+        <div class="qr-card">
+          <div class="step-label ${cls}">${label}</div>
+          <img src="${qrSrc}" alt="QR Code Etapa ${step}" loading="lazy" />
+          <div class="qr-url">${url}</div>
+          <button class="btn-print" onclick="printCard(${step})">Imprimir QR</button>
+        </div>`;
+    }).join('');
+  }
+
+  function printCard(step) {
+    const base = document.getElementById('baseUrl').value.trim().replace(/\/$/, '');
+    const url = `${base}/?step=${step}`;
+    const qrSrc = QR_API + encodeURIComponent(url);
+
+    const w = window.open('', '_blank', 'width=400,height=500');
+    w.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>QR ${step} — BLACKOUT HUNT</title>
+        <style>
+          body { font-family: monospace; text-align: center; padding: 2rem; }
+          h1 { font-size: 2rem; margin-bottom: 1rem; }
+          img { width: 200px; height: 200px; margin-bottom: 1rem; }
+          p { font-size: 0.8rem; color: #555; word-break: break-all; }
+        </style>
+      </head>
+      <body>
+        <h1>BLACKOUT HUNT<br>CHECKPOINT ${step}${step === 4 ? ' — FINAL' : ''}</h1>
+        <img src="${qrSrc}" />
+        <p>${url}</p>
+        <script>window.onload = () => { window.print(); window.close(); }<\/script>
+      </body>
+      </html>`);
+    w.document.close();
+  }
+
+  // Generate on load
+  generate();
+</script>
+</body>
+</html>

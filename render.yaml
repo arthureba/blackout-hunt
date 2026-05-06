@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: blackout-hunt
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: blackout-hunt-db
+          property: connectionString
+      - key: ADMIN_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+databases:
+  - name: blackout-hunt-db
+    plan: free

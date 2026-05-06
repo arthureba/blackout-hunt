@@ -1,0 +1,57 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const path = require('path');
+
+const scanRouter = require('./routes/scan');
+const rankingRouter = require('./routes/ranking');
+const adminRouter = require('./routes/admin');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// CORS
+const corsOrigin =
+  process.env.NODE_ENV === 'production' ? 'https://blackouthunt.com.br' : true;
+app.use(cors({ origin: corsOrigin }));
+
+app.use(express.json());
+
+// Rate limiting
+const scanLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'Muitas requisições. Tente novamente em 1 minuto.' },
+});
+
+const adminLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'Muitas requisições admin. Tente novamente em 1 minuto.' },
+});
+
+// Serve frontend
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
+
+// Health check
+app.get('/health', (req, res) => res.json({ ok: true }));
+
+// API routes
+app.use('/scan', scanLimiter, scanRouter);
+app.use('/ranking', rankingRouter);
+app.use('/admin', adminLimiter, adminRouter);
+
+// Fallback to frontend
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
+});
+
+app.listen(PORT, () => {
+  console.log(`BLACKOUT HUNT server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});
