@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
 const db = require('../db');
 
 function adminAuth(req, res, next) {
@@ -76,6 +78,17 @@ router.get('/status', async (req, res) => {
   } catch (err) {
     console.error('Status error:', err);
     return res.status(500).json({ ok: false, error: 'Erro interno do servidor' });
+  }
+});
+
+router.post('/init-db', async (req, res) => {
+  try {
+    const schema = fs.readFileSync(path.join(__dirname, '..', '..', 'schema.sql'), 'utf8');
+    await db.query(schema);
+    return res.json({ ok: true, message: 'Schema inicializado com sucesso' });
+  } catch (err) {
+    console.error('Init DB error:', err);
+    return res.status(500).json({ ok: false, error: err.message });
   }
 });
 

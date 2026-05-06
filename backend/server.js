@@ -10,14 +10,19 @@ const rankingRouter = require('./routes/ranking');
 const adminRouter = require('./routes/admin');
 const db = require('./db');
 
-async function initDb() {
-  try {
-    const schema = fs.readFileSync(path.join(__dirname, '..', 'schema.sql'), 'utf8');
-    await db.query(schema);
-    console.log('Database schema initialized');
-  } catch (err) {
-    console.error('DB init error:', err.message);
+async function initDb(retries = 5) {
+  for (let i = 1; i <= retries; i++) {
+    try {
+      const schema = fs.readFileSync(path.join(__dirname, '..', 'schema.sql'), 'utf8');
+      await db.query(schema);
+      console.log('Database schema initialized');
+      return;
+    } catch (err) {
+      console.error(`DB init attempt ${i}/${retries} failed:`, err.message);
+      if (i < retries) await new Promise(r => setTimeout(r, 3000 * i));
+    }
   }
+  console.error('DB init failed after all retries — app will still start');
 }
 
 const app = express();
