@@ -29,9 +29,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // CORS
-const corsOrigins = ['https://blackouthunt.com.br', 'https://www.blackouthunt.com.br'];
+const allowedOrigins = [
+  'https://blackouthunt.com.br',
+  'https://www.blackouthunt.com.br',
+];
 const corsOrigin = process.env.NODE_ENV === 'production'
-  ? (origin, cb) => (!origin || corsOrigins.includes(origin) ? cb(null, true) : cb(new Error('CORS')))
+  ? (origin, cb) => {
+      if (!origin) return cb(null, true);
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      if (/\.railway\.app$/.test(origin)) return cb(null, true);
+      return cb(new Error('CORS'));
+    }
   : true;
 app.use(cors({ origin: corsOrigin }));
 
