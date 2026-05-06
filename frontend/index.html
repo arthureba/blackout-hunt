@@ -40,22 +40,18 @@
       position: relative;
     }
 
-    .logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(3rem, 10vw, 6rem);
-      letter-spacing: 0.08em;
-      background: linear-gradient(135deg, var(--neon), var(--orange));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 20px rgba(255, 45, 85, 0.5));
+    .logo-img {
+      max-width: min(600px, 90vw);
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      filter: drop-shadow(0 0 20px rgba(170, 255, 0, 0.4));
       animation: logoPulse 3s ease-in-out infinite;
-      line-height: 1;
     }
 
     @keyframes logoPulse {
-      0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 45, 85, 0.5)); }
-      50% { filter: drop-shadow(0 0 35px rgba(255, 45, 85, 0.9)); }
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(170, 255, 0, 0.4)); }
+      50% { filter: drop-shadow(0 0 40px rgba(170, 255, 0, 0.8)); }
     }
 
     .tagline {
@@ -656,7 +652,7 @@
 <body>
 
 <header>
-  <div class="logo">BLACKOUT HUNT</div>
+  <img src="/HUNT.png" alt="BLACKOUT HUNT" class="logo-img" />
   <div class="tagline">Caça ao Tesouro · Ao Vivo</div>
 </header>
 
