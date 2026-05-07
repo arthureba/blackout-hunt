@@ -5,6 +5,20 @@ const db = require('../db');
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[\d\s\-().]{7,20}$/;
 
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxMtwRLnjr3-B2FfST4Le20SsingGQpTBB6qnmlgiFvvzxf8DOkbPBTy6OWgBu0iyhNcQ/exec';
+
+async function sendToSheets(data) {
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  } catch (err) {
+    console.error('Sheets sync error:', err.message);
+  }
+}
+
 function formatMs(ms) {
   if (ms == null) return null;
   const totalCs = Math.floor(ms / 10);
@@ -186,6 +200,15 @@ router.post('/', async (req, res) => {
     }
 
     await client.query('COMMIT');
+
+    // Sync lead to Google Sheets (non-blocking)
+    sendToSheets({
+      name: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      instagram: cleanInsta,
+      step: stepNum,
+    });
 
     return res.json({
       ok: true,
