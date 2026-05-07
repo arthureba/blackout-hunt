@@ -201,14 +201,16 @@ router.post('/', async (req, res) => {
 
     await client.query('COMMIT');
 
-    // Sync lead to Google Sheets (non-blocking)
-    sendToSheets({
-      name: cleanName,
-      email: cleanEmail,
-      phone: cleanPhone,
-      instagram: cleanInsta,
-      step: stepNum,
-    });
+    // Sync lead to Google Sheets apenas no primeiro scan
+    if (stepNum === 1) {
+      sendToSheets({
+        name: cleanName,
+        email: cleanEmail,
+        phone: cleanPhone,
+        instagram: cleanInsta,
+        step: stepNum,
+      });
+    }
 
     return res.json({
       ok: true,
