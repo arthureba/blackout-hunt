@@ -4,6 +4,16 @@ const fs = require('fs');
 const path = require('path');
 const db = require('../db');
 
+function formatMs(ms) {
+  if (ms == null) return '';
+  const totalCs = Math.floor(ms / 10);
+  const cs = totalCs % 100;
+  const totalSec = Math.floor(totalCs / 100);
+  const sec = totalSec % 60;
+  const min = Math.floor(totalSec / 60);
+  return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+}
+
 function adminAuth(req, res, next) {
   const secret = req.headers['x-admin-secret'];
   if (!secret || secret !== process.env.ADMIN_SECRET) {
@@ -88,6 +98,36 @@ router.post('/init-db', async (req, res) => {
     return res.json({ ok: true, message: 'Schema inicializado com sucesso' });
   } catch (err) {
     console.error('Init DB error:', err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+router.get('/leads.csv', async (req, res) => {
+  try {
+    const result = await db.query(
+      `SELECT name, email, phone, instagram, total_qr, total_time_ms, created_at
+       FROM users
+       ORDER BY created_at ASC`
+    );
+
+    const lines = [
+      ['Nome', 'Email', 'Telefone', 'Instagram', 'Checkpoints', 'Tempo Total', 'Cadastrado em'].join(';'),
+      ...result.rows.map(u => [
+        u.name,
+        u.email,
+        u.phone,
+        u.instagram || '',
+        u.total_qr,
+        u.total_time_ms > 0 ? formatMs(u.total_time_ms) : '',
+        new Date(u.created_at).toLocaleString('pt-BR'),
+      ].join(';'))
+    ];
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="leads-blackout-hunt.csv"');
+    res.send('﻿' + lines.join('\n'));
+  } catch (err) {
+    console.error('CSV export error:', err);
     return res.status(500).json({ ok: false, error: err.message });
   }
 });
