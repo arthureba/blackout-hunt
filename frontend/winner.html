@@ -6,10 +6,6 @@
   <title>BLACKOUT HUNT — VENCEDOR</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <script type="importmap">
-    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
-                   "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/" } }
-  </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -86,20 +82,27 @@
       50%       { text-shadow: 0 0 35px rgba(170,255,0,0.9), 0 0 90px rgba(170,255,0,0.4); }
     }
 
-    /* CARD 3D — ESTRELA */
-    #card3d {
+    /* CARD VIDEO — ESTRELA */
+    .card-wrap {
       flex: 1;
-      display: block;
-      width: min(360px, 88vw);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       min-height: 0;
-      /* drop shadow pulsante via filter */
-      filter: drop-shadow(0 0 30px rgba(170,255,0,0.35)) drop-shadow(0 0 60px rgba(255,215,0,0.15));
+      width: 100%;
+    }
+
+    #cardVideo {
+      display: block;
+      width: min(340px, 84vw);
+      height: auto;
+      border-radius: 12px;
       animation: cardGlow 2s ease-in-out infinite;
     }
 
     @keyframes cardGlow {
-      0%, 100% { filter: drop-shadow(0 0 25px rgba(170,255,0,0.3)) drop-shadow(0 0 50px rgba(255,215,0,0.12)); }
-      50%       { filter: drop-shadow(0 0 50px rgba(170,255,0,0.65)) drop-shadow(0 0 90px rgba(255,215,0,0.28)); }
+      0%, 100% { filter: drop-shadow(0 0 25px rgba(170,255,0,0.35)) drop-shadow(0 0 50px rgba(255,215,0,0.15)); }
+      50%       { filter: drop-shadow(0 0 55px rgba(170,255,0,0.7))  drop-shadow(0 0 100px rgba(255,215,0,0.3)); }
     }
 
     /* BOTTOM INFO */
@@ -182,10 +185,8 @@
 
       .right-col { flex-shrink: 0; }
 
-      #card3d {
+      #cardVideo {
         width: min(420px, 44vw);
-        height: min(420px, 44vw);
-        flex: unset;
       }
 
       .bottom-info { text-align: left; }
@@ -202,7 +203,10 @@
 
   <h1 id="titleEl">VOCÊ<br>VENCEU!</h1>
 
-  <canvas id="card3d"></canvas>
+  <div class="card-wrap" id="cardWrap">
+    <video id="cardVideo" src="/assets/card-video.mp4"
+      autoplay loop muted playsinline preload="auto"></video>
+  </div>
 
   <div class="bottom-info">
     <div class="winner-name" id="winnerName">—</div>
@@ -213,148 +217,6 @@
   </div>
 </div>
 
-<!-- THREE.JS -->
-<script type="module">
-  import * as THREE from 'three';
-  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-  const canvas = document.getElementById('card3d');
-
-  function getSize() {
-    const r = canvas.getBoundingClientRect();
-    return { w: r.width || canvas.clientWidth, h: r.height || canvas.clientHeight };
-  }
-
-  const { w, h } = getSize();
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(w, h);
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 2.2;
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 100);
-
-  // === HOLOFOTES — card é a estrela ===
-
-  // Ambiente mínimo — escuridão dramática
-  scene.add(new THREE.AmbientLight(0xffffff, 0.25));
-
-  // SPOTLIGHT PRINCIPAL — de cima, branco quente, direto no card
-  const spot1 = new THREE.SpotLight(0xfff5cc, 12);
-  spot1.position.set(0, 6, 4);
-  spot1.angle = Math.PI / 7;
-  spot1.penumbra = 0.4;
-  spot1.decay = 1.2;
-  scene.add(spot1);
-  scene.add(spot1.target); // target no origin
-
-  // SPOTLIGHT VERDE — holofote lateral neon
-  const spotGreen = new THREE.SpotLight(0xaaff00, 9);
-  spotGreen.position.set(-4, 4, 3);
-  spotGreen.angle = Math.PI / 6;
-  spotGreen.penumbra = 0.5;
-  spotGreen.decay = 1.2;
-  scene.add(spotGreen);
-  scene.add(spotGreen.target);
-
-  // SPOTLIGHT DOURADO — de baixo, brilho no card
-  const spotGold = new THREE.SpotLight(0xffd700, 7);
-  spotGold.position.set(0, -4, 3);
-  spotGold.angle = Math.PI / 5;
-  spotGold.penumbra = 0.6;
-  spotGold.decay = 1.4;
-  scene.add(spotGold);
-  scene.add(spotGold.target);
-
-  // POINT LIGHT verde pulsante — halo neon no card
-  const pointGreen = new THREE.PointLight(0xaaff00, 10, 5);
-  pointGreen.position.set(0, 0, 2.5);
-  scene.add(pointGreen);
-
-  // POINT LIGHT azul gelado — reflexo lateral
-  const pointBlue = new THREE.PointLight(0x44ddff, 4, 5);
-  pointBlue.position.set(3, 1, 0);
-  scene.add(pointBlue);
-
-  // POINT LIGHT branco — preenchimento frontal
-  const pointFront = new THREE.PointLight(0xffffff, 5, 6);
-  pointFront.position.set(0, 0, 4);
-  scene.add(pointFront);
-
-  const controls = new OrbitControls(camera, canvas);
-  controls.enableZoom = false;
-  controls.enablePan = false;
-  controls.autoRotate = true;
-  controls.autoRotateSpeed = 3;
-  controls.minPolarAngle = Math.PI / 3.2;
-  controls.maxPolarAngle = Math.PI / 1.9;
-
-  const loader = new GLTFLoader();
-  loader.load('/assets/card3d.gltf', (gltf) => {
-    const model = gltf.scene;
-
-    model.traverse((child) => {
-      if (child.isMesh && child.material) {
-        child.material.envMapIntensity = 3.0;
-        child.material.metalness = Math.min((child.material.metalness ?? 0) + 0.2, 1);
-        child.material.roughness = Math.max((child.material.roughness ?? 0.5) - 0.15, 0.05);
-        child.material.needsUpdate = true;
-      }
-    });
-
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    model.position.sub(center);
-
-    const dist = Math.max(size.x, size.y, size.z) * 2.0;
-    camera.position.z = dist;
-
-    // Apontar spotlights pro model
-    spot1.target.position.set(0, 0, 0);
-    spotGreen.target.position.set(0, 0, 0);
-    spotGold.target.position.set(0, 0, 0);
-
-    scene.add(model);
-
-    let t = 0;
-    (function animate() {
-      requestAnimationFrame(animate);
-      t += 0.014;
-
-      // Float
-      model.position.y = Math.sin(t) * 0.09;
-
-      // Pulso principal — verde neon
-      pointGreen.intensity = 8 + Math.sin(t * 2.2) * 4;
-      pointGreen.position.x = Math.sin(t * 0.6) * 1.2;
-      pointGreen.position.y = Math.cos(t * 0.4) * 0.8;
-
-      // Spotlight verde oscila levemente
-      spotGreen.intensity = 7 + Math.sin(t * 1.5) * 3;
-
-      // Spot principal pulsa suave
-      spot1.intensity = 11 + Math.sin(t * 0.9) * 2;
-
-      // Azul orbita
-      pointBlue.position.x = Math.cos(t * 0.8) * 2.5;
-      pointBlue.position.z = Math.sin(t * 0.8) * 2;
-
-      controls.update();
-      renderer.render(scene, camera);
-    })();
-  }, undefined, (err) => console.error('GLTF error:', err));
-
-  window.addEventListener('resize', () => {
-    const { w, h } = getSize();
-    renderer.setSize(w, h);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-  });
-</script>
 
 <!-- CONFETTI -->
 <script>
@@ -418,7 +280,7 @@
     const page = document.getElementById('page');
     const logo = document.getElementById('logoEl');
     const title = document.getElementById('titleEl');
-    const card = document.getElementById('card3d');
+    const wrap = document.getElementById('cardWrap');
     const bottom = document.querySelector('.bottom-info');
 
     const left = document.createElement('div');
@@ -427,7 +289,7 @@
 
     const right = document.createElement('div');
     right.className = 'right-col';
-    right.append(card);
+    right.append(wrap);
 
     page.innerHTML = '';
     page.append(left, right);
