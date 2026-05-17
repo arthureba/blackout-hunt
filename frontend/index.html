@@ -682,6 +682,7 @@
     <div class="admin-btn-row">
       <button class="btn btn-secondary" onclick="adminFetchStatus()">↻ Status</button>
       <button class="btn btn-danger" onclick="adminResetWinner()">Reset Vencedor</button>
+      <button class="btn btn-orange" onclick="downloadLeads()">⬇ Baixar Leads CSV</button>
     </div>
 
     <div id="adminUserCount" class="text-muted"></div>
@@ -1164,6 +1165,12 @@ async function adminDeactivate(step) {
   } catch (err) {
     showToast('Erro de conexão', 'error');
   }
+}
+
+function downloadLeads() {
+  const secret = getAdminSecret();
+  if (!secret) { showToast('Informe o admin secret', 'error'); return; }
+  window.location.href = `/admin/leads.csv?x-admin-secret=${encodeURIComponent(secret)}`;
 }
 
 async function adminResetWinner() {
