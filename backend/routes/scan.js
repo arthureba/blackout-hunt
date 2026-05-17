@@ -163,9 +163,9 @@ router.post('/', async (req, res) => {
     const now = Date.now();
     const timeSpentMs = now - activatedAt;
 
-    // Update user record
-    const newTotal = (user.total_time_ms || 0) + timeSpentMs;
-    const newTotalQr = (user.total_qr || 0) + 1;
+    // Update user record (parse as int to avoid string concatenation with BIGINT)
+    const newTotal = (parseInt(user.total_time_ms, 10) || 0) + timeSpentMs;
+    const newTotalQr = (parseInt(user.total_qr, 10) || 0) + 1;
 
     const updateResult = await client.query(
       `UPDATE users
