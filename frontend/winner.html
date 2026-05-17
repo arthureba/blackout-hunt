@@ -15,177 +15,201 @@
 
     html, body {
       height: 100%;
-      overflow: hidden;
       background: #0a0a0a;
       color: #e0e0e0;
       font-family: 'Space Mono', monospace;
+      overflow: hidden;
     }
 
+    /* CONFETTI */
     #confetti {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      inset: 0;
       pointer-events: none;
       z-index: 0;
     }
 
+    /* SPOTLIGHT BG — foco no centro */
+    .glow-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 55% 55% at 50% 52%, rgba(170,255,0,0.13) 0%, rgba(170,255,0,0.04) 35%, transparent 70%),
+        radial-gradient(ellipse 30% 20% at 50% 52%, rgba(255,215,0,0.10) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* LAYOUT */
     .page {
       position: relative;
       z-index: 1;
       height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      gap: 0;
-      padding: 1.5rem 2rem;
-    }
-
-    @media (max-width: 640px) {
-      html, body { overflow: auto; }
-      .page {
-        grid-template-columns: 1fr;
-        height: auto;
-        min-height: 100vh;
-        text-align: center;
-        padding: 1.5rem 1rem;
-        gap: 1rem;
-      }
-      #card3d { order: -1; }
-    }
-
-    /* LEFT SIDE */
-    .left {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: 0.6rem;
-      padding-right: 2rem;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: max(env(safe-area-inset-top), 0.7rem);
+      padding-bottom: max(env(safe-area-inset-bottom), 0.7rem);
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    /* TOP ROW — logo + título */
+    .top-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      flex-shrink: 0;
     }
 
     .logo-img {
-      max-width: min(260px, 80%);
+      max-width: 140px;
+      width: 35vw;
       height: auto;
-      filter: drop-shadow(0 0 15px rgba(170,255,0,0.4));
-      margin-bottom: 0.5rem;
-    }
-
-    .winner-badge {
-      display: inline-block;
-      background: #aaff00;
-      color: #000;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 0.85rem;
-      letter-spacing: 0.2em;
-      padding: 0.3rem 1rem;
-      border-radius: 2px;
-      width: fit-content;
-      animation: badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
-    }
-
-    @keyframes badgePop {
-      from { transform: scale(0); opacity: 0; }
-      to   { transform: scale(1); opacity: 1; }
+      filter: drop-shadow(0 0 8px rgba(170,255,0,0.4));
     }
 
     h1 {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      letter-spacing: 0.04em;
+      font-size: clamp(2.4rem, 12vw, 4rem);
+      letter-spacing: 0.05em;
       color: #aaff00;
       line-height: 1;
+      text-align: center;
       animation: glowPulse 2s ease-in-out infinite;
     }
 
     @keyframes glowPulse {
-      0%, 100% { filter: drop-shadow(0 0 15px rgba(170,255,0,0.5)); }
-      50%       { filter: drop-shadow(0 0 35px rgba(170,255,0,0.9)); }
+      0%, 100% { text-shadow: 0 0 18px rgba(170,255,0,0.5), 0 0 50px rgba(170,255,0,0.15); }
+      50%       { text-shadow: 0 0 35px rgba(170,255,0,0.9), 0 0 90px rgba(170,255,0,0.4); }
+    }
+
+    /* CARD 3D — ESTRELA */
+    #card3d {
+      flex: 1;
+      display: block;
+      width: min(360px, 88vw);
+      min-height: 0;
+      /* drop shadow pulsante via filter */
+      filter: drop-shadow(0 0 30px rgba(170,255,0,0.35)) drop-shadow(0 0 60px rgba(255,215,0,0.15));
+      animation: cardGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes cardGlow {
+      0%, 100% { filter: drop-shadow(0 0 25px rgba(170,255,0,0.3)) drop-shadow(0 0 50px rgba(255,215,0,0.12)); }
+      50%       { filter: drop-shadow(0 0 50px rgba(170,255,0,0.65)) drop-shadow(0 0 90px rgba(255,215,0,0.28)); }
+    }
+
+    /* BOTTOM INFO */
+    .bottom-info {
+      text-align: center;
+      flex-shrink: 0;
     }
 
     .winner-name {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(1.4rem, 4vw, 2.5rem);
+      font-size: clamp(1.3rem, 6vw, 2rem);
       color: #fff;
       letter-spacing: 0.04em;
       line-height: 1.1;
     }
 
     .winner-insta {
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       color: #aaff00;
+      margin-top: 0.1rem;
     }
 
     .winner-time {
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       color: #555;
+      margin-top: 0.1rem;
+      margin-bottom: 0.5rem;
     }
 
     .subtitle {
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       color: #444;
-      line-height: 1.7;
-      max-width: 340px;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
     }
 
     .btn-back {
       display: inline-block;
       font-family: 'Space Mono', monospace;
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      padding: 0.6rem 1.5rem;
-      border: 1px solid #aaff00;
+      padding: 0.45rem 1.2rem;
+      border: 1px solid #333;
       background: transparent;
-      color: #aaff00;
+      color: #555;
       border-radius: 4px;
-      cursor: pointer;
       text-decoration: none;
-      width: fit-content;
-      transition: background 0.15s;
-      margin-top: 0.4rem;
+      transition: all 0.15s;
     }
 
-    .btn-back:hover { background: rgba(170,255,0,0.1); }
+    .btn-back:hover { border-color: #aaff00; color: #aaff00; }
 
-    /* RIGHT SIDE — 3D */
-    .right {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    /* DESKTOP */
+    @media (min-width: 700px) and (min-height: 500px) {
+      .page {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 4rem;
+        padding: 2rem 4rem;
+      }
 
-    #card3d {
-      width: min(420px, 45vw);
-      height: min(420px, 45vw);
-    }
+      .left-col {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+        flex: 1;
+        max-width: 340px;
+      }
 
-    @media (max-width: 640px) {
-      #card3d { width: 80vw; height: 80vw; }
-      .left { padding-right: 0; align-items: center; }
-      .winner-badge, .btn-back, .subtitle { align-self: center; }
+      .logo-img { max-width: 200px; width: 18vw; }
+
+      h1 {
+        font-size: clamp(3rem, 6.5vw, 5rem);
+        text-align: left;
+      }
+
+      .right-col { flex-shrink: 0; }
+
+      #card3d {
+        width: min(420px, 44vw);
+        height: min(420px, 44vw);
+        flex: unset;
+      }
+
+      .bottom-info { text-align: left; }
     }
   </style>
 </head>
 <body>
 
 <canvas id="confetti"></canvas>
+<div class="glow-bg"></div>
 
-<div class="page">
-  <!-- LEFT -->
-  <div class="left">
-    <img src="/HUNT.png" alt="BLACKOUT HUNT" class="logo-img" />
-    <div class="winner-badge">🏆 PRIMEIRO LUGAR</div>
-    <h1>VOCÊ<br>VENCEU!</h1>
+<div class="page" id="page">
+  <img src="/HUNT.png" alt="BLACKOUT HUNT" class="logo-img" id="logoEl" />
+
+  <h1 id="titleEl">VOCÊ<br>VENCEU!</h1>
+
+  <canvas id="card3d"></canvas>
+
+  <div class="bottom-info">
     <div class="winner-name" id="winnerName">—</div>
     <div class="winner-insta" id="winnerInsta"></div>
     <div class="winner-time" id="winnerTime"></div>
-    <p class="subtitle">Você foi o primeiro a completar todos os 4 checkpoints. O prêmio é seu. Parabéns!</p>
+    <p class="subtitle">Primeiro a completar os 4 checkpoints.<br>O prêmio é seu!</p>
     <a href="/" class="btn-back">← Ver Ranking</a>
-  </div>
-
-  <!-- RIGHT -->
-  <div class="right">
-    <canvas id="card3d"></canvas>
   </div>
 </div>
 
@@ -196,53 +220,140 @@
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
   const canvas = document.getElementById('card3d');
-  const w = canvas.clientWidth;
-  const h = canvas.clientHeight;
 
+  function getSize() {
+    const r = canvas.getBoundingClientRect();
+    return { w: r.width || canvas.clientWidth, h: r.height || canvas.clientHeight };
+  }
+
+  const { w, h } = getSize();
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(w, h);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 2.2;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
-  camera.position.set(0, 0, 3);
+  const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 100);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 1.5));
-  const dir = new THREE.DirectionalLight(0xaaff00, 2.5);
-  dir.position.set(2, 3, 2);
-  scene.add(dir);
-  const rim = new THREE.DirectionalLight(0xffffff, 1);
-  rim.position.set(-2, -1, -2);
-  scene.add(rim);
+  // === HOLOFOTES — card é a estrela ===
+
+  // Ambiente mínimo — escuridão dramática
+  scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+
+  // SPOTLIGHT PRINCIPAL — de cima, branco quente, direto no card
+  const spot1 = new THREE.SpotLight(0xfff5cc, 12);
+  spot1.position.set(0, 6, 4);
+  spot1.angle = Math.PI / 7;
+  spot1.penumbra = 0.4;
+  spot1.decay = 1.2;
+  scene.add(spot1);
+  scene.add(spot1.target); // target no origin
+
+  // SPOTLIGHT VERDE — holofote lateral neon
+  const spotGreen = new THREE.SpotLight(0xaaff00, 9);
+  spotGreen.position.set(-4, 4, 3);
+  spotGreen.angle = Math.PI / 6;
+  spotGreen.penumbra = 0.5;
+  spotGreen.decay = 1.2;
+  scene.add(spotGreen);
+  scene.add(spotGreen.target);
+
+  // SPOTLIGHT DOURADO — de baixo, brilho no card
+  const spotGold = new THREE.SpotLight(0xffd700, 7);
+  spotGold.position.set(0, -4, 3);
+  spotGold.angle = Math.PI / 5;
+  spotGold.penumbra = 0.6;
+  spotGold.decay = 1.4;
+  scene.add(spotGold);
+  scene.add(spotGold.target);
+
+  // POINT LIGHT verde pulsante — halo neon no card
+  const pointGreen = new THREE.PointLight(0xaaff00, 10, 5);
+  pointGreen.position.set(0, 0, 2.5);
+  scene.add(pointGreen);
+
+  // POINT LIGHT azul gelado — reflexo lateral
+  const pointBlue = new THREE.PointLight(0x44ddff, 4, 5);
+  pointBlue.position.set(3, 1, 0);
+  scene.add(pointBlue);
+
+  // POINT LIGHT branco — preenchimento frontal
+  const pointFront = new THREE.PointLight(0xffffff, 5, 6);
+  pointFront.position.set(0, 0, 4);
+  scene.add(pointFront);
 
   const controls = new OrbitControls(camera, canvas);
   controls.enableZoom = false;
   controls.enablePan = false;
   controls.autoRotate = true;
   controls.autoRotateSpeed = 3;
-  controls.minPolarAngle = Math.PI / 3;
-  controls.maxPolarAngle = Math.PI / 1.5;
+  controls.minPolarAngle = Math.PI / 3.2;
+  controls.maxPolarAngle = Math.PI / 1.9;
 
   const loader = new GLTFLoader();
   loader.load('/assets/card3d.gltf', (gltf) => {
     const model = gltf.scene;
+
+    model.traverse((child) => {
+      if (child.isMesh && child.material) {
+        child.material.envMapIntensity = 3.0;
+        child.material.metalness = Math.min((child.material.metalness ?? 0) + 0.2, 1);
+        child.material.roughness = Math.max((child.material.roughness ?? 0.5) - 0.15, 0.05);
+        child.material.needsUpdate = true;
+      }
+    });
+
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     model.position.sub(center);
-    camera.position.z = Math.max(size.x, size.y, size.z) * 2;
+
+    const dist = Math.max(size.x, size.y, size.z) * 2.0;
+    camera.position.z = dist;
+
+    // Apontar spotlights pro model
+    spot1.target.position.set(0, 0, 0);
+    spotGreen.target.position.set(0, 0, 0);
+    spotGold.target.position.set(0, 0, 0);
+
     scene.add(model);
 
     let t = 0;
     (function animate() {
       requestAnimationFrame(animate);
-      t += 0.01;
-      model.position.y = Math.sin(t) * 0.06;
+      t += 0.014;
+
+      // Float
+      model.position.y = Math.sin(t) * 0.09;
+
+      // Pulso principal — verde neon
+      pointGreen.intensity = 8 + Math.sin(t * 2.2) * 4;
+      pointGreen.position.x = Math.sin(t * 0.6) * 1.2;
+      pointGreen.position.y = Math.cos(t * 0.4) * 0.8;
+
+      // Spotlight verde oscila levemente
+      spotGreen.intensity = 7 + Math.sin(t * 1.5) * 3;
+
+      // Spot principal pulsa suave
+      spot1.intensity = 11 + Math.sin(t * 0.9) * 2;
+
+      // Azul orbita
+      pointBlue.position.x = Math.cos(t * 0.8) * 2.5;
+      pointBlue.position.z = Math.sin(t * 0.8) * 2;
+
       controls.update();
       renderer.render(scene, camera);
     })();
-  }, undefined, (err) => console.error('GLTF:', err));
+  }, undefined, (err) => console.error('GLTF error:', err));
+
+  window.addEventListener('resize', () => {
+    const { w, h } = getSize();
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  });
 </script>
 
 <!-- CONFETTI -->
@@ -254,17 +365,18 @@
   resize();
   window.addEventListener('resize', resize);
 
-  const colors = ['#aaff00','#ccff00','#ffffff','#ffd700','#00ffcc'];
-  const pieces = Array.from({ length: 100 }, () => ({
+  const colors = ['#aaff00','#ccff00','#ffffff','#ffd700','#00ffcc','#ffee00','#aaffaa'];
+  const pieces = Array.from({ length: 160 }, () => ({
     x: Math.random() * window.innerWidth,
     y: Math.random() * window.innerHeight - window.innerHeight,
-    w: Math.random() * 10 + 4,
-    h: Math.random() * 5 + 3,
+    w: Math.random() * 12 + 4,
+    h: Math.random() * 6 + 3,
     color: colors[Math.floor(Math.random() * colors.length)],
-    speed: Math.random() * 2.5 + 0.8,
+    speed: Math.random() * 3 + 0.8,
     angle: Math.random() * Math.PI * 2,
-    spin: (Math.random() - 0.5) * 0.12,
-    drift: (Math.random() - 0.5) * 1.2,
+    spin: (Math.random() - 0.5) * 0.14,
+    drift: (Math.random() - 0.5) * 1.5,
+    opacity: Math.random() * 0.45 + 0.5,
   }));
 
   (function draw() {
@@ -274,11 +386,11 @@
       ctx.translate(p.x, p.y);
       ctx.rotate(p.angle);
       ctx.fillStyle = p.color;
-      ctx.globalAlpha = 0.8;
+      ctx.globalAlpha = p.opacity;
       ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
       ctx.restore();
       p.y += p.speed; p.x += p.drift; p.angle += p.spin;
-      if (p.y > c.height) { p.y = -10; p.x = Math.random() * c.width; }
+      if (p.y > c.height) { p.y = -12; p.x = Math.random() * c.width; }
     });
     requestAnimationFrame(draw);
   })();
@@ -288,21 +400,38 @@
 <!-- WINNER DATA -->
 <script>
 (async function() {
-  function formatMs(ms) {
-    if (!ms) return '';
-    const cs = Math.floor(ms/10)%100, s = Math.floor(ms/1000)%60, m = Math.floor(ms/60000);
-    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
-  }
   try {
     const data = await (await fetch('/ranking')).json();
     const w = data.ranking.find(u => u.is_winner);
     if (w) {
       document.getElementById('winnerName').textContent = w.name;
-      document.getElementById('winnerInsta').textContent = w.instagram || '';
-      document.getElementById('winnerTime').textContent = `Tempo total: ${w.total_time_formatted}`;
+      if (w.instagram) document.getElementById('winnerInsta').textContent = w.instagram;
+      document.getElementById('winnerTime').textContent = 'Tempo total: ' + w.total_time_formatted;
     }
   } catch(e) {}
 })();
+</script>
+
+<!-- DESKTOP REARRANGE -->
+<script>
+  if (window.innerWidth >= 700) {
+    const page = document.getElementById('page');
+    const logo = document.getElementById('logoEl');
+    const title = document.getElementById('titleEl');
+    const card = document.getElementById('card3d');
+    const bottom = document.querySelector('.bottom-info');
+
+    const left = document.createElement('div');
+    left.className = 'left-col';
+    left.append(logo, title, bottom);
+
+    const right = document.createElement('div');
+    right.className = 'right-col';
+    right.append(card);
+
+    page.innerHTML = '';
+    page.append(left, right);
+  }
 </script>
 
 </body>
