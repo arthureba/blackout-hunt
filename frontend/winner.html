@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLACKOUT HUNT — VENCEDOR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+                   "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/" } }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      color: #e0e0e0;
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* CONFETTI CANVAS */
+    #confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    /* LOGO */
+    .logo-img {
+      max-width: min(340px, 80vw);
+      height: auto;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 0 20px rgba(170,255,0,0.5));
+    }
+
+    /* WINNER BADGE */
+    .winner-badge {
+      display: inline-block;
+      background: #aaff00;
+      color: #000;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.2em;
+      padding: 0.4rem 1.2rem;
+      border-radius: 2px;
+      margin-bottom: 1rem;
+      animation: badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    @keyframes badgePop {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    /* TITLE */
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 10vw, 5rem);
+      letter-spacing: 0.05em;
+      color: #aaff00;
+      filter: drop-shadow(0 0 30px rgba(170,255,0,0.6));
+      animation: glowPulse 2s ease-in-out infinite;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(170,255,0,0.5)); }
+      50%       { filter: drop-shadow(0 0 50px rgba(170,255,0,0.9)); }
+    }
+
+    .winner-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.8rem, 7vw, 3.5rem);
+      color: #fff;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+
+    .winner-insta {
+      font-size: 1rem;
+      color: #aaff00;
+      margin-bottom: 0.5rem;
+    }
+
+    .winner-time {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 2rem;
+    }
+
+    /* 3D CANVAS */
+    #card3d {
+      width: min(420px, 90vw);
+      height: min(420px, 90vw);
+      margin: 0 auto 2rem;
+      cursor: grab;
+    }
+
+    #card3d:active { cursor: grabbing; }
+
+    /* SUBTITLE */
+    .subtitle {
+      font-size: 0.85rem;
+      color: #555;
+      max-width: 400px;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    /* BACK BUTTON */
+    .btn-back {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.8rem 2rem;
+      border: 1px solid #aaff00;
+      background: transparent;
+      color: #aaff00;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.15s;
+    }
+
+    .btn-back:hover { background: rgba(170,255,0,0.1); }
+
+    /* PARTICLES */
+    .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="page">
+  <img src="/HUNT.png" alt="BLACKOUT HUNT" class="logo-img" />
+
+  <div class="winner-badge">🏆 PRIMEIRO LUGAR</div>
+
+  <h1>VOCÊ VENCEU!</h1>
+
+  <div class="winner-name" id="winnerName">—</div>
+  <div class="winner-insta" id="winnerInsta"></div>
+  <div class="winner-time" id="winnerTime"></div>
+
+  <canvas id="card3d"></canvas>
+
+  <p class="subtitle">
+    Você foi o primeiro a completar todos os 4 checkpoints.<br />
+    O prêmio é seu. Parabéns!
+  </p>
+
+  <a href="/" class="btn-back">← Ver Ranking</a>
+</div>
+
+<!-- THREE.JS 3D CARD -->
+<script type="module">
+  import * as THREE from 'three';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+  const canvas = document.getElementById('card3d');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 0, 3);
+
+  // Lights
+  const ambient = new THREE.AmbientLight(0xffffff, 1.2);
+  scene.add(ambient);
+  const dirLight = new THREE.DirectionalLight(0xaaff00, 2);
+  dirLight.position.set(2, 3, 2);
+  scene.add(dirLight);
+  const rimLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  rimLight.position.set(-2, -1, -2);
+  scene.add(rimLight);
+
+  // Controls
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableZoom = false;
+  controls.enablePan = false;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 3;
+  controls.minPolarAngle = Math.PI / 3;
+  controls.maxPolarAngle = Math.PI / 1.5;
+
+  // Load GLTF
+  const loader = new GLTFLoader();
+  loader.load('/card3d.gltf', (gltf) => {
+    const model = gltf.scene;
+
+    // Center model
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    model.position.sub(center);
+    camera.position.z = maxDim * 1.8;
+
+    scene.add(model);
+
+    // Float animation
+    let t = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      t += 0.01;
+      model.position.y = Math.sin(t) * 0.08;
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  }, undefined, (err) => {
+    console.error('GLTF load error:', err);
+  });
+
+  // Resize
+  window.addEventListener('resize', () => {
+    const w = canvas.clientWidth;
+    renderer.setSize(w, w);
+  });
+</script>
+
+<!-- CONFETTI -->
+<script>
+(function() {
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#aaff00', '#ccff00', '#ffffff', '#ffd700', '#00ffcc'];
+  const pieces = Array.from({ length: 120 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    w: Math.random() * 10 + 5,
+    h: Math.random() * 6 + 3,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    speed: Math.random() * 3 + 1,
+    angle: Math.random() * Math.PI * 2,
+    spin: (Math.random() - 0.5) * 0.15,
+    drift: (Math.random() - 0.5) * 1.5,
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = 0.85;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+      p.y += p.speed;
+      p.x += p.drift;
+      p.angle += p.spin;
+      if (p.y > canvas.height) {
+        p.y = -10;
+        p.x = Math.random() * canvas.width;
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+})();
+</script>
+
+<!-- LOAD WINNER DATA -->
+<script>
+(async function() {
+  function formatMs(ms) {
+    if (!ms) return '';
+    const totalCs = Math.floor(ms / 10);
+    const cs = totalCs % 100;
+    const totalSec = Math.floor(totalCs / 100);
+    const sec = totalSec % 60;
+    const min = Math.floor(totalSec / 60);
+    return `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
+  }
+
+  try {
+    const res = await fetch('/ranking');
+    const data = await res.json();
+    const winner = data.ranking.find(u => u.is_winner);
+    if (winner) {
+      document.getElementById('winnerName').textContent = winner.name;
+      document.getElementById('winnerInsta').textContent = winner.instagram || '';
+      document.getElementById('winnerTime').textContent = `Tempo total: ${winner.total_time_formatted}`;
+    }
+  } catch(e) {}
+})();
+</script>
+
+</body>
+</html>

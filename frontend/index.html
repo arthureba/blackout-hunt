@@ -902,6 +902,12 @@ async function doScan() {
     }
 
     saveUser(data.user);
+
+    // Redireciona vencedor para página de congratulations
+    if (data.winnerStatus === 'winner') {
+      setTimeout(() => { window.location.href = '/winner.html'; }, 1500);
+    }
+
     showResult(data);
     loadRanking(true);
   } catch (err) {
