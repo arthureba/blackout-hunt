@@ -681,7 +681,7 @@
 
     <div class="admin-btn-row">
       <button class="btn btn-secondary" onclick="adminFetchStatus()">↻ Status</button>
-      <button class="btn btn-danger" onclick="adminResetWinner()">Reset Vencedor</button>
+      <button class="btn btn-danger" onclick="adminResetAll()">⟳ Resetar Tudo</button>
       <button class="btn btn-orange" onclick="downloadLeads()">⬇ Baixar Leads CSV</button>
     </div>
 
@@ -1173,20 +1173,21 @@ function downloadLeads() {
   window.location.href = `/admin/leads.csv?x-admin-secret=${encodeURIComponent(secret)}`;
 }
 
-async function adminResetWinner() {
+async function adminResetAll() {
   const secret = getAdminSecret();
   if (!secret) { showToast('Informe o admin secret', 'error'); return; }
 
-  if (!confirm('Tem certeza que deseja resetar o vencedor?')) return;
+  if (!confirm('Isso vai apagar TODOS os participantes e zerar o ranking. Tem certeza?')) return;
 
   try {
-    const res = await fetch(`${API_BASE}/admin/reset-winner`, {
+    const res = await fetch(`${API_BASE}/admin/reset-all`, {
       method: 'POST',
       headers: { 'x-admin-secret': secret },
     });
     const data = await res.json();
     if (data.ok) {
-      showToast('Vencedor resetado!', 'success');
+      showToast('Ranking zerado com sucesso!', 'success');
+      document.getElementById('resultPanel').style.display = 'none';
       adminFetchStatus();
       loadRanking(true);
     } else {
