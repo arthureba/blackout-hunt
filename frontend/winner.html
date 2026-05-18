@@ -6,330 +6,141 @@
   <title>BLACKOUT HUNT — VENCEDOR</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <script type="importmap">
-    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
-                   "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/" } }
-  </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      height: 100%;
-      background: #0a0a0a;
-      color: #e0e0e0;
+      height: 100%; width: 100%;
+      background: #080808;
+      overflow: hidden;
       font-family: 'Space Mono', monospace;
-      overflow: hidden;
+      color: #e0e0e0;
     }
 
-    .glow-bg {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(170,255,0,0.07) 0%, transparent 70%);
-    }
-
-    /* ─── LAYOUT PRINCIPAL ─── */
-    .page {
-      position: relative; z-index: 1;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* ─── FAIXAS DE FOTO ─── */
-    .strip-wrap {
-      flex-shrink: 0;
-      overflow: hidden;
-      /* Fade nas bordas L/R */
-      -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
-      mask-image:         linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
-    }
-
-    .strip-wrap.top {
-      padding-top: max(env(safe-area-inset-top), 0.5rem);
-      padding-bottom: 0.3rem;
-      /* Perspective cria a curva — faixa recua nos cantos */
-      perspective: 600px;
-      perspective-origin: 50% 100%;
-    }
-
-    .strip-wrap.bottom {
-      padding-top: 0.3rem;
-      padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
-      perspective: 600px;
-      perspective-origin: 50% 0%;
-    }
-
-    /* Camada intermediária aplica a inclinação 3D */
-    .strip-tilt {
-      transform-style: preserve-3d;
-    }
-    .strip-wrap.top    .strip-tilt { transform: rotateX(-22deg); transform-origin: center bottom; }
-    .strip-wrap.bottom .strip-tilt { transform: rotateX( 22deg); transform-origin: center top;    }
-
-    /* Camada de scroll — só translateX */
-    .strip-track {
-      display: flex;
-      gap: 8px;
-      width: max-content;
-      animation: goLeft 32s linear infinite;
-    }
-    .strip-track.rev { animation: goRight 32s linear infinite; }
-
-    @keyframes goLeft  { from { transform: translateX(0);    } to { transform: translateX(-33.333%); } }
-    @keyframes goRight { from { transform: translateX(-33.333%); } to { transform: translateX(0); } }
-
-    .photo-card {
-      width: 88px;
-      height: 116px;
-      border-radius: 12px;
-      overflow: hidden;
-      flex-shrink: 0;
-      background: #111;
-    }
-
-    .photo-card img {
-      width: 100%; height: 100%;
-      object-fit: cover; display: block;
+    /* ── ARC CONTAINER ── */
+    #arc {
+      position: fixed;
+      inset: 0;
       pointer-events: none;
+      z-index: 0;
     }
 
-    /* ─── CENTRO ─── */
+    .arc-photo {
+      position: absolute;
+      top: 0; left: 0;
+      width: 92px; height: 120px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #111;
+      will-change: transform, opacity;
+      transition: opacity 0.3s;
+    }
+
+    .arc-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ── CONTEÚDO CENTRAL ── */
     .center {
-      flex: 1;
+      position: relative;
+      z-index: 1;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0.25rem;
-      min-height: 0;
-      padding: 0.4rem 1rem;
-      position: relative;
-    }
-
-    /* Suave fade no topo e base do centro para fundir com as faixas */
-    .center::before, .center::after {
-      content: '';
-      position: absolute;
-      left: 0; right: 0;
-      height: 48px;
+      gap: 0.5rem;
+      padding: max(env(safe-area-inset-top), 1rem) 2rem max(env(safe-area-inset-bottom), 1rem);
+      text-align: center;
       pointer-events: none;
-      z-index: 2;
     }
-    .center::before { top: 0;    background: linear-gradient(to bottom, #0a0a0a, transparent); }
-    .center::after  { bottom: 0; background: linear-gradient(to top,    #0a0a0a, transparent); }
 
-    /* ─── LOGO ─── */
     .logo-img {
-      width: min(130px, 32vw);
+      width: min(150px, 38vw);
       height: auto;
-      filter: drop-shadow(0 0 8px rgba(170,255,0,0.4));
-      flex-shrink: 0;
+      filter: drop-shadow(0 0 12px rgba(170,255,0,0.45));
+      margin-bottom: 0.5rem;
     }
 
-    /* ─── TÍTULO ─── */
     h1 {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2rem, 10vw, 3.5rem);
+      font-size: clamp(3rem, 16vw, 5.5rem);
       letter-spacing: 0.05em;
       color: #aaff00;
-      line-height: 0.95;
-      text-align: center;
-      flex-shrink: 0;
+      line-height: 1;
       animation: glowPulse 2.5s ease-in-out infinite;
     }
 
     @keyframes glowPulse {
-      0%, 100% { text-shadow: 0 0 16px rgba(170,255,0,0.55); }
-      50%       { text-shadow: 0 0 38px rgba(170,255,0,0.95), 0 0 70px rgba(170,255,0,0.3); }
+      0%, 100% { text-shadow: 0 0 20px rgba(170,255,0,0.55); }
+      50%       { text-shadow: 0 0 45px rgba(170,255,0,1), 0 0 90px rgba(170,255,0,0.35); }
     }
 
-    /* ─── CARD 3D ─── */
-    #card3d {
-      display: block;
-      width: min(160px, 44vw);
-      aspect-ratio: 1;
-      flex-shrink: 0;
+    .divider {
+      width: 40px; height: 1px;
+      background: #333;
+      margin: 0.25rem 0;
     }
 
-    /* ─── INFO VENCEDOR ─── */
     .winner-name {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(1.1rem, 5vw, 1.7rem);
+      font-size: clamp(1.4rem, 7vw, 2.2rem);
       color: #fff;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.06em;
       line-height: 1.1;
-      text-align: center;
     }
-    .winner-insta { font-size: 0.75rem; color: #aaff00; }
-    .winner-time  { font-size: 0.6rem;  color: #555; margin-bottom: 0.1rem; }
+
+    .winner-insta {
+      font-size: 0.8rem;
+      color: #aaff00;
+      letter-spacing: 0.03em;
+    }
+
+    .winner-time {
+      font-size: 0.62rem;
+      color: #444;
+      margin-top: -0.15rem;
+    }
 
     .btn-back {
+      pointer-events: all;
       display: inline-block;
+      margin-top: 0.5rem;
       font-family: 'Space Mono', monospace;
-      font-size: 0.6rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.08em;
-      padding: 0.4rem 1rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.5rem 1.4rem;
       border: 1px solid #2a2a2a;
-      background: transparent; color: #555;
-      border-radius: 4px; text-decoration: none;
-      transition: all 0.15s;
+      background: transparent;
+      color: #555;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
     }
     .btn-back:hover { border-color: #aaff00; color: #aaff00; }
-
-    /* ─── DESKTOP ─── */
-    @media (min-width: 700px) and (min-height: 500px) {
-      .photo-card { width: 150px; height: 190px; border-radius: 18px; }
-      .strip-track { gap: 14px; }
-
-      .center { flex-direction: row; gap: 4rem; justify-content: center; padding: 0 3rem; }
-      .center::before { display: none; }
-      .center::after  { display: none; }
-
-      .left-col {
-        display: flex; flex-direction: column;
-        align-items: flex-start; gap: 0.4rem;
-        max-width: 320px;
-      }
-
-      .logo-img { width: min(180px, 18vw); }
-      h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); text-align: left; }
-      .winner-name { text-align: left; }
-
-      #card3d { width: min(240px, 28vw); }
-    }
   </style>
 </head>
 <body>
 
-<div class="glow-bg"></div>
+<!-- Arco de fotos -->
+<div id="arc"></div>
 
-<div class="page" id="page">
-
-  <!-- Faixa topo (rola para a esquerda) -->
-  <div class="strip-wrap top">
-    <div class="strip-tilt">
-      <div class="strip-track" id="stripTop"></div>
-    </div>
-  </div>
-
-  <!-- Conteúdo central -->
-  <div class="center" id="center">
-    <img src="/HUNT.png" alt="BLACKOUT HUNT" class="logo-img" id="logoEl" />
-    <h1 id="titleEl">VOCÊ<br>VENCEU!</h1>
-    <canvas id="card3d"></canvas>
-    <div class="winner-name" id="winnerName">—</div>
-    <div class="winner-insta" id="winnerInsta"></div>
-    <div class="winner-time" id="winnerTime"></div>
-    <a href="/" class="btn-back">← Ver Ranking</a>
-  </div>
-
-  <!-- Faixa base (rola para a direita) -->
-  <div class="strip-wrap bottom">
-    <div class="strip-tilt">
-      <div class="strip-track rev" id="stripBottom"></div>
-    </div>
-  </div>
-
+<!-- Conteúdo central -->
+<div class="center">
+  <img src="/HUNT.png" alt="BLACKOUT HUNT" class="logo-img" />
+  <h1>VOCÊ VENCEU!</h1>
+  <div class="divider"></div>
+  <div class="winner-name" id="winnerName">—</div>
+  <div class="winner-insta" id="winnerInsta"></div>
+  <div class="winner-time"  id="winnerTime"></div>
+  <a href="/" class="btn-back">← Retornar ao Ranking</a>
 </div>
-
-<!-- FOTOS -->
-<script>
-const PHOTOS = [
-  '/assets/photos/p1.jpg',
-  '/assets/photos/p2.jpg',
-  '/assets/photos/p3.jpg',
-  '/assets/photos/p4.jpg',
-  '/assets/photos/p5.jpg',
-  '/assets/photos/p6.jpg',
-  '/assets/photos/p7.jpg',
-  '/assets/photos/p8.jpg',
-  '/assets/photos/p9.jpg',
-  '/assets/photos/p10.jpg',
-  '/assets/photos/p11.jpg',
-  '/assets/photos/p12.jpg',
-  '/assets/photos/p13.jpg',
-  '/assets/photos/p14.jpg',
-  '/assets/photos/p15.jpg',
-  '/assets/photos/p16.jpg',
-];
-
-function buildStrip(el, photos) {
-  // Triplicar — animação vai de 0 a -33.333% = loop perfeito
-  const all = [...photos, ...photos, ...photos];
-  el.innerHTML = all.map(src =>
-    `<div class="photo-card"><img src="${src}" alt="" loading="eager" decoding="async" /></div>`
-  ).join('');
-}
-
-buildStrip(document.getElementById('stripTop'),    PHOTOS);
-buildStrip(document.getElementById('stripBottom'), [...PHOTOS].reverse());
-</script>
-
-<!-- THREE.JS — leve -->
-<script type="module">
-  import * as THREE from 'three';
-  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-  const canvas = document.getElementById('card3d');
-  function sz() { const r = canvas.getBoundingClientRect(); return { w: r.width || 190, h: r.height || 190 }; }
-  const { w, h } = sz();
-
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
-  renderer.setSize(w, h);
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.8;
-
-  const scene  = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
-
-  scene.add(new THREE.AmbientLight(0xffffff, 0.65));
-  const key = new THREE.DirectionalLight(0xccff44, 3.5);
-  key.position.set(2, 3, 3);
-  scene.add(key);
-  const neon = new THREE.PointLight(0xaaff00, 7, 8);
-  neon.position.set(0, 0, 2.5);
-  scene.add(neon);
-
-  const controls = new OrbitControls(camera, canvas);
-  controls.enableZoom = false; controls.enablePan = false;
-  controls.autoRotate = true; controls.autoRotateSpeed = 2.5;
-  controls.minPolarAngle = Math.PI / 2.8;
-  controls.maxPolarAngle = Math.PI / 2.8;
-
-  new GLTFLoader().load('/assets/card3d.gltf', (gltf) => {
-    const model = gltf.scene;
-    model.traverse(c => {
-      if (c.isMesh && c.material) { c.material.envMapIntensity = 1.5; c.material.needsUpdate = true; }
-    });
-    const box = new THREE.Box3().setFromObject(model);
-    model.position.sub(box.getCenter(new THREE.Vector3()));
-    const size = box.getSize(new THREE.Vector3());
-    camera.position.z = Math.max(size.x, size.y, size.z) * 3.0;
-    scene.add(model);
-
-    let t = 0;
-    const MS = 1000 / 30;
-    let last = 0;
-    function tick(now) {
-      requestAnimationFrame(tick);
-      if (now - last < MS) return;
-      last = now; t += 0.02;
-      model.position.y = Math.sin(t) * 0.07;
-      neon.intensity = 6 + Math.sin(t * 1.8) * 2;
-      controls.update();
-      renderer.render(scene, camera);
-    }
-    requestAnimationFrame(tick);
-  }, undefined, e => console.error('GLTF:', e));
-
-  window.addEventListener('resize', () => {
-    const { w, h } = sz();
-    renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
-  });
-</script>
 
 <!-- WINNER DATA -->
 <script>
@@ -346,25 +157,92 @@ buildStrip(document.getElementById('stripBottom'), [...PHOTOS].reverse());
 })();
 </script>
 
-<!-- DESKTOP REARRANGE -->
+<!-- ARCO DE FOTOS -->
 <script>
-if (window.innerWidth >= 700) {
-  const center = document.getElementById('center');
-  const logo   = document.getElementById('logoEl');
-  const title  = document.getElementById('titleEl');
-  const card   = document.getElementById('card3d');
-  const name   = document.getElementById('winnerName');
-  const insta  = document.getElementById('winnerInsta');
-  const time   = document.getElementById('winnerTime');
-  const btn    = document.querySelector('.btn-back');
+(function() {
+  const PHOTOS = [
+    '/assets/photos/p1.jpg',  '/assets/photos/p2.jpg',
+    '/assets/photos/p3.jpg',  '/assets/photos/p4.jpg',
+    '/assets/photos/p5.jpg',  '/assets/photos/p6.jpg',
+    '/assets/photos/p7.jpg',  '/assets/photos/p8.jpg',
+    '/assets/photos/p9.jpg',  '/assets/photos/p10.jpg',
+    '/assets/photos/p11.jpg', '/assets/photos/p12.jpg',
+    '/assets/photos/p13.jpg', '/assets/photos/p14.jpg',
+    '/assets/photos/p15.jpg', '/assets/photos/p16.jpg',
+  ];
 
-  const left = document.createElement('div');
-  left.className = 'left-col';
-  left.append(logo, title, name, insta, time, btn);
+  const container = document.getElementById('arc');
+  const PW = 92, PH = 120; // photo card dimensions
 
-  center.innerHTML = '';
-  center.append(left, card);
-}
+  // Cria elementos de foto
+  const els = PHOTOS.map(src => {
+    const div = document.createElement('div');
+    div.className = 'arc-photo';
+    const img = document.createElement('img');
+    img.src = src; img.alt = ''; img.draggable = false;
+    div.appendChild(img);
+    container.appendChild(div);
+    return div;
+  });
+
+  const N = els.length;
+  let offset = 0;
+  let last = 0;
+  const MS = 1000 / 30; // 30fps
+
+  // Ângulos em graus (estilo relógio: 0=topo, 90=direita, 180=baixo, 270=esquerda)
+  const GAP_CENTER = 180;  // gap no centro-baixo
+  const GAP_HALF   = 38;   // metade do gap em graus (~76° total)
+  const ARC_DEG    = 360 - GAP_HALF * 2; // ~284° de arco visível
+  const ARC_START  = GAP_CENTER + GAP_HALF; // onde o arco começa (sentido horário)
+
+  function render(now) {
+    requestAnimationFrame(render);
+    if (now - last < MS) return;
+    last = now;
+
+    offset = (offset + 0.00022) % 1; // velocidade de rotação
+
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const CX = W / 2;
+    const CY = H * 0.44;
+    const RX = Math.min(W * 0.56, 340);
+    const RY = Math.min(H * 0.50, 400);
+
+    els.forEach((el, i) => {
+      // t = posição normalizada [0,1] de cada foto ao longo do arco
+      const t = ((i / N) + offset) % 1;
+
+      // Ângulo no arco (graus, estilo relógio)
+      const angleDeg = (ARC_START + t * ARC_DEG) % 360;
+
+      // Converter para radianos cartesianos (0=direita, anti-horário, y invertido)
+      const rad = (angleDeg - 90) * Math.PI / 180;
+
+      const x = CX + RX * Math.cos(rad);
+      const y = CY + RY * Math.sin(rad);
+
+      // Escala: maior no topo (angleDeg≈0), menor nas bordas
+      const distFromTop = Math.min(angleDeg, 360 - angleDeg) / 180;
+      const scale = 0.62 + 0.38 * (1 - distFromTop);
+
+      // Leve rotação seguindo a tangente do arco
+      const tilt = (angleDeg - 90) * 0.12;
+
+      // Fade nas extremidades do arco (perto do gap)
+      const distFromGapL = Math.abs(((angleDeg - (GAP_CENTER - GAP_HALF) + 360) % 360));
+      const distFromGapR = Math.abs(((angleDeg - (GAP_CENTER + GAP_HALF) + 360) % 360));
+      const minDist = Math.min(distFromGapL, distFromGapR);
+      const opacity  = Math.min(minDist / 28, 1);
+
+      el.style.transform = `translate(${x - PW/2}px, ${y - PH/2}px) rotate(${tilt}deg) scale(${scale})`;
+      el.style.opacity = opacity;
+    });
+  }
+
+  requestAnimationFrame(render);
+})();
 </script>
 
 </body>
