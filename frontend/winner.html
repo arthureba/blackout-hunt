@@ -39,39 +39,49 @@
     .strip-wrap {
       flex-shrink: 0;
       overflow: hidden;
-      /* Fade nas bordas esquerda/direita */
-      -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
-      mask-image:         linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+      /* Fade nas bordas L/R */
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+      mask-image:         linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
     }
 
     .strip-wrap.top {
-      padding-top: max(env(safe-area-inset-top), 0.6rem);
-      padding-bottom: 0.4rem;
+      padding-top: max(env(safe-area-inset-top), 0.5rem);
+      padding-bottom: 0.3rem;
+      /* Perspective cria a curva — faixa recua nos cantos */
+      perspective: 600px;
+      perspective-origin: 50% 100%;
     }
 
     .strip-wrap.bottom {
-      padding-top: 0.4rem;
-      padding-bottom: max(env(safe-area-inset-bottom), 0.6rem);
+      padding-top: 0.3rem;
+      padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+      perspective: 600px;
+      perspective-origin: 50% 0%;
     }
 
+    /* Camada intermediária aplica a inclinação 3D */
+    .strip-tilt {
+      transform-style: preserve-3d;
+    }
+    .strip-wrap.top    .strip-tilt { transform: rotateX(-22deg); transform-origin: center bottom; }
+    .strip-wrap.bottom .strip-tilt { transform: rotateX( 22deg); transform-origin: center top;    }
+
+    /* Camada de scroll — só translateX */
     .strip-track {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       width: max-content;
-      animation: goLeft 30s linear infinite;
+      animation: goLeft 32s linear infinite;
     }
+    .strip-track.rev { animation: goRight 32s linear infinite; }
 
-    .strip-track.rev {
-      animation: goRight 30s linear infinite;
-    }
-
-    @keyframes goLeft  { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-    @keyframes goRight { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+    @keyframes goLeft  { from { transform: translateX(0);    } to { transform: translateX(-33.333%); } }
+    @keyframes goRight { from { transform: translateX(-33.333%); } to { transform: translateX(0); } }
 
     .photo-card {
-      width: 110px;
-      height: 144px;
-      border-radius: 14px;
+      width: 88px;
+      height: 116px;
+      border-radius: 12px;
       overflow: hidden;
       flex-shrink: 0;
       background: #111;
@@ -136,7 +146,7 @@
     /* ─── CARD 3D ─── */
     #card3d {
       display: block;
-      width: min(190px, 50vw);
+      width: min(160px, 44vw);
       aspect-ratio: 1;
       flex-shrink: 0;
     }
@@ -185,7 +195,7 @@
       h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); text-align: left; }
       .winner-name { text-align: left; }
 
-      #card3d { width: min(280px, 32vw); }
+      #card3d { width: min(240px, 28vw); }
     }
   </style>
 </head>
@@ -197,7 +207,9 @@
 
   <!-- Faixa topo (rola para a esquerda) -->
   <div class="strip-wrap top">
-    <div class="strip-track" id="stripTop"></div>
+    <div class="strip-tilt">
+      <div class="strip-track" id="stripTop"></div>
+    </div>
   </div>
 
   <!-- Conteúdo central -->
@@ -213,7 +225,9 @@
 
   <!-- Faixa base (rola para a direita) -->
   <div class="strip-wrap bottom">
-    <div class="strip-track rev" id="stripBottom"></div>
+    <div class="strip-tilt">
+      <div class="strip-track rev" id="stripBottom"></div>
+    </div>
   </div>
 
 </div>
@@ -240,7 +254,7 @@ const PHOTOS = [
 ];
 
 function buildStrip(el, photos) {
-  // Triplicar para garantir loop suave mesmo em telas largas
+  // Triplicar — animação vai de 0 a -33.333% = loop perfeito
   const all = [...photos, ...photos, ...photos];
   el.innerHTML = all.map(src =>
     `<div class="photo-card"><img src="${src}" alt="" loading="eager" decoding="async" /></div>`
