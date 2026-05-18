@@ -21,12 +21,11 @@
       overflow: hidden;
     }
 
-.glow-bg {
-      position: fixed; inset: 0; z-index: 0;
+    .glow-bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background:
-        radial-gradient(ellipse 55% 55% at 50% 52%, rgba(170,255,0,0.10) 0%, transparent 70%),
-        radial-gradient(ellipse 30% 20% at 50% 52%, rgba(255,215,0,0.07) 0%, transparent 50%);
-      pointer-events: none;
+        radial-gradient(ellipse 55% 55% at 50% 52%, rgba(170,255,0,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 30% 20% at 50% 52%, rgba(255,215,0,0.06) 0%, transparent 50%);
     }
 
     .page {
@@ -57,17 +56,10 @@
       50%       { text-shadow: 0 0 40px rgba(170,255,0,0.95), 0 0 80px rgba(170,255,0,0.3); }
     }
 
-    /* CARD 3D */
     #card3d {
       flex: 1; display: block;
-      width: min(280px, 72vw);
+      width: min(300px, 78vw);
       min-height: 0;
-      animation: cardGlow 2.5s ease-in-out infinite;
-    }
-
-    @keyframes cardGlow {
-      0%, 100% { filter: drop-shadow(0 0 20px rgba(170,255,0,0.3)) drop-shadow(0 0 40px rgba(255,215,0,0.12)); }
-      50%       { filter: drop-shadow(0 0 45px rgba(170,255,0,0.65)) drop-shadow(0 0 80px rgba(255,215,0,0.25)); }
     }
 
     .bottom-info { text-align: center; flex-shrink: 0; }
@@ -91,17 +83,9 @@
     }
     .btn-back:hover { border-color: #aaff00; color: #aaff00; }
 
-    /* DESKTOP */
     @media (min-width: 700px) and (min-height: 500px) {
-      .page {
-        flex-direction: row; justify-content: center;
-        align-items: center; gap: 4rem; padding: 2rem 4rem;
-      }
-      .left-col {
-        display: flex; flex-direction: column;
-        align-items: flex-start; gap: 0.6rem;
-        flex: 1; max-width: 340px;
-      }
+      .page { flex-direction: row; justify-content: center; align-items: center; gap: 4rem; padding: 2rem 4rem; }
+      .left-col { display: flex; flex-direction: column; align-items: flex-start; gap: 0.6rem; flex: 1; max-width: 340px; }
       .logo-img { max-width: 200px; width: 18vw; }
       h1 { font-size: clamp(3rem, 6.5vw, 5rem); text-align: left; }
       .right-col { flex-shrink: 0; }
@@ -127,23 +111,17 @@
   </div>
 </div>
 
-<!-- THREE.JS — enxuto, sem OrbitControls -->
 <script type="module">
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
   const canvas = document.getElementById('card3d');
-
-  function sz() {
-    const r = canvas.getBoundingClientRect();
-    return { w: r.width || 280, h: r.height || 280 };
-  }
-
+  function sz() { const r = canvas.getBoundingClientRect(); return { w: r.width || 300, h: r.height || 300 }; }
   const { w, h } = sz();
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
-  // Pixel ratio máximo 1 em mobile — grande ganho de performance
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1)); // cap em 1 = maior ganho mobile
   renderer.setSize(w, h);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -152,20 +130,28 @@
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
 
-  // === 3 LUZES APENAS ===
-  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  // 3 luzes — ambiente + key verde + neon point
+  scene.add(new THREE.AmbientLight(0xffffff, 0.65));
 
   const key = new THREE.DirectionalLight(0xccff44, 3.5);
-  key.position.set(2, 3, 4);
+  key.position.set(2, 3, 3);
   scene.add(key);
 
-  const neon = new THREE.PointLight(0xaaff00, 6, 8);
-  neon.position.set(-1, 0, 3);
+  const neon = new THREE.PointLight(0xaaff00, 7, 8);
+  neon.position.set(0, 0, 2.5);
   scene.add(neon);
+
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableZoom = false;
+  controls.enablePan  = false;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 2.5;
+  // Trava rotação vertical — só gira de lado pra lado
+  controls.minPolarAngle = Math.PI / 2.8;
+  controls.maxPolarAngle = Math.PI / 2.8;
 
   new GLTFLoader().load('/assets/card3d.gltf', (gltf) => {
     const model = gltf.scene;
-
     model.traverse((child) => {
       if (child.isMesh && child.material) {
         child.material.envMapIntensity = 1.5;
@@ -173,36 +159,31 @@
       }
     });
 
-    // Centralizar anchor point
-    const box = new THREE.Box3().setFromObject(model);
+    const box  = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
     const size   = box.getSize(new THREE.Vector3());
-    model.position.sub(center);
+    model.position.sub(center); // anchor no centro
     camera.position.z = Math.max(size.x, size.y, size.z) * 2.1;
     scene.add(model);
 
-    // Travar ângulo vertical: inclinação fixa, só gira no Y
-    model.rotation.x = 0.12; // leve tilt para mostrar a face do card
-
     let t = 0;
-    // Throttle a 40fps para poupar CPU
-    const MS_PER_FRAME = 1000 / 40;
+    const MS = 1000 / 30; // 30fps — suave e econômico
     let last = 0;
 
     function animate(now) {
       requestAnimationFrame(animate);
-      if (now - last < MS_PER_FRAME) return;
+      if (now - last < MS) return;
       last = now;
-      t += 0.018;
+      t += 0.02;
 
-      model.rotation.y += 0.018;          // gira suavemente no eixo Y
-      model.position.y = Math.sin(t) * 0.06; // float suave
-      neon.intensity = 5 + Math.sin(t * 1.8) * 2; // pulso leve
+      model.position.y = Math.sin(t) * 0.07;
+      neon.intensity    = 6 + Math.sin(t * 1.8) * 2;
 
+      controls.update();
       renderer.render(scene, camera);
     }
     requestAnimationFrame(animate);
-  }, undefined, (err) => console.error('GLTF:', err));
+  }, undefined, (e) => console.error('GLTF:', e));
 
   window.addEventListener('resize', () => {
     const { w, h } = sz();
@@ -211,7 +192,6 @@
     camera.updateProjectionMatrix();
   });
 </script>
-
 
 <!-- WINNER DATA -->
 <script>
@@ -236,15 +216,10 @@
     const title  = document.getElementById('titleEl');
     const card   = document.getElementById('card3d');
     const bottom = document.querySelector('.bottom-info');
-
-    const left = document.createElement('div');
-    left.className = 'left-col';
+    const left   = document.createElement('div'); left.className = 'left-col';
+    const right  = document.createElement('div'); right.className = 'right-col';
     left.append(logo, title, bottom);
-
-    const right = document.createElement('div');
-    right.className = 'right-col';
     right.append(card);
-
     page.innerHTML = '';
     page.append(left, right);
   }
