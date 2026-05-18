@@ -94,9 +94,8 @@
 
     #cardVideo {
       display: block;
-      width: min(340px, 84vw);
+      width: min(260px, 68vw);
       height: auto;
-      border-radius: 12px;
       animation: cardGlow 2s ease-in-out infinite;
     }
 
@@ -186,7 +185,7 @@
       .right-col { flex-shrink: 0; }
 
       #cardVideo {
-        width: min(420px, 44vw);
+        width: min(340px, 38vw);
       }
 
       .bottom-info { text-align: left; }
@@ -204,8 +203,10 @@
   <h1 id="titleEl">VOCÊ<br>VENCEU!</h1>
 
   <div class="card-wrap" id="cardWrap">
-    <video id="cardVideo" src="/assets/card-video.mp4"
-      autoplay loop muted playsinline preload="auto"></video>
+    <video id="cardVideo" autoplay loop muted playsinline preload="auto">
+      <source src="/assets/card-video.webm" type="video/webm" />
+      <source src="/assets/card-video.mp4" type="video/mp4" />
+    </video>
   </div>
 
   <div class="bottom-info">
