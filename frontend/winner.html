@@ -6,6 +6,10 @@
   <title>BLACKOUT HUNT — VENCEDOR</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+                   "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/" } }
+  </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -17,177 +21,96 @@
       overflow: hidden;
     }
 
-    /* CONFETTI */
     #confetti {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
     }
 
-    /* SPOTLIGHT BG — foco no centro */
     .glow-bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
+      position: fixed; inset: 0; z-index: 0;
       background:
-        radial-gradient(ellipse 55% 55% at 50% 52%, rgba(170,255,0,0.13) 0%, rgba(170,255,0,0.04) 35%, transparent 70%),
-        radial-gradient(ellipse 30% 20% at 50% 52%, rgba(255,215,0,0.10) 0%, transparent 50%);
+        radial-gradient(ellipse 55% 55% at 50% 52%, rgba(170,255,0,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 30% 20% at 50% 52%, rgba(255,215,0,0.07) 0%, transparent 50%);
       pointer-events: none;
     }
 
-    /* LAYOUT */
     .page {
-      position: relative;
-      z-index: 1;
+      position: relative; z-index: 1;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: space-between;
       padding-top: max(env(safe-area-inset-top), 0.7rem);
       padding-bottom: max(env(safe-area-inset-bottom), 0.7rem);
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
-
-    /* TOP ROW — logo + título */
-    .top-row {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.2rem;
-      flex-shrink: 0;
+      padding-left: 1rem; padding-right: 1rem;
     }
 
     .logo-img {
-      max-width: 140px;
-      width: 35vw;
-      height: auto;
+      max-width: 140px; width: 35vw; height: auto; flex-shrink: 0;
       filter: drop-shadow(0 0 8px rgba(170,255,0,0.4));
     }
 
     h1 {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(2.4rem, 12vw, 4rem);
-      letter-spacing: 0.05em;
-      color: #aaff00;
-      line-height: 1;
-      text-align: center;
-      animation: glowPulse 2s ease-in-out infinite;
+      letter-spacing: 0.05em; color: #aaff00;
+      line-height: 1; text-align: center; flex-shrink: 0;
+      animation: glowPulse 2.5s ease-in-out infinite;
     }
 
     @keyframes glowPulse {
-      0%, 100% { text-shadow: 0 0 18px rgba(170,255,0,0.5), 0 0 50px rgba(170,255,0,0.15); }
-      50%       { text-shadow: 0 0 35px rgba(170,255,0,0.9), 0 0 90px rgba(170,255,0,0.4); }
+      0%, 100% { text-shadow: 0 0 18px rgba(170,255,0,0.5); }
+      50%       { text-shadow: 0 0 40px rgba(170,255,0,0.95), 0 0 80px rgba(170,255,0,0.3); }
     }
 
-    /* CARD VIDEO — ESTRELA */
-    .card-wrap {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    /* CARD 3D */
+    #card3d {
+      flex: 1; display: block;
+      width: min(280px, 72vw);
       min-height: 0;
-      width: 100%;
-    }
-
-    #cardVideo {
-      display: block;
-      width: min(260px, 68vw);
-      height: auto;
-      animation: cardGlow 2s ease-in-out infinite;
+      animation: cardGlow 2.5s ease-in-out infinite;
     }
 
     @keyframes cardGlow {
-      0%, 100% { filter: drop-shadow(0 0 25px rgba(170,255,0,0.35)) drop-shadow(0 0 50px rgba(255,215,0,0.15)); }
-      50%       { filter: drop-shadow(0 0 55px rgba(170,255,0,0.7))  drop-shadow(0 0 100px rgba(255,215,0,0.3)); }
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(170,255,0,0.3)) drop-shadow(0 0 40px rgba(255,215,0,0.12)); }
+      50%       { filter: drop-shadow(0 0 45px rgba(170,255,0,0.65)) drop-shadow(0 0 80px rgba(255,215,0,0.25)); }
     }
 
-    /* BOTTOM INFO */
-    .bottom-info {
-      text-align: center;
-      flex-shrink: 0;
-    }
+    .bottom-info { text-align: center; flex-shrink: 0; }
 
     .winner-name {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(1.3rem, 6vw, 2rem);
-      color: #fff;
-      letter-spacing: 0.04em;
-      line-height: 1.1;
+      color: #fff; letter-spacing: 0.04em; line-height: 1.1;
     }
-
-    .winner-insta {
-      font-size: 0.8rem;
-      color: #aaff00;
-      margin-top: 0.1rem;
-    }
-
-    .winner-time {
-      font-size: 0.65rem;
-      color: #555;
-      margin-top: 0.1rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .subtitle {
-      font-size: 0.65rem;
-      color: #444;
-      line-height: 1.6;
-      margin-bottom: 0.5rem;
-    }
+    .winner-insta { font-size: 0.8rem; color: #aaff00; margin-top: 0.1rem; }
+    .winner-time  { font-size: 0.65rem; color: #555; margin-top: 0.1rem; margin-bottom: 0.5rem; }
+    .subtitle     { font-size: 0.65rem; color: #444; line-height: 1.6; margin-bottom: 0.5rem; }
 
     .btn-back {
       display: inline-block;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.45rem 1.2rem;
-      border: 1px solid #333;
-      background: transparent;
-      color: #555;
-      border-radius: 4px;
-      text-decoration: none;
-      transition: all 0.15s;
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0.45rem 1.2rem; border: 1px solid #333;
+      background: transparent; color: #555; border-radius: 4px;
+      text-decoration: none; transition: all 0.15s;
     }
-
     .btn-back:hover { border-color: #aaff00; color: #aaff00; }
 
     /* DESKTOP */
     @media (min-width: 700px) and (min-height: 500px) {
       .page {
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        gap: 4rem;
-        padding: 2rem 4rem;
+        flex-direction: row; justify-content: center;
+        align-items: center; gap: 4rem; padding: 2rem 4rem;
       }
-
       .left-col {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.6rem;
-        flex: 1;
-        max-width: 340px;
+        display: flex; flex-direction: column;
+        align-items: flex-start; gap: 0.6rem;
+        flex: 1; max-width: 340px;
       }
-
       .logo-img { max-width: 200px; width: 18vw; }
-
-      h1 {
-        font-size: clamp(3rem, 6.5vw, 5rem);
-        text-align: left;
-      }
-
+      h1 { font-size: clamp(3rem, 6.5vw, 5rem); text-align: left; }
       .right-col { flex-shrink: 0; }
-
-      #cardVideo {
-        width: min(340px, 38vw);
-      }
-
+      #card3d { width: min(360px, 40vw); flex: unset; }
       .bottom-info { text-align: left; }
     }
   </style>
@@ -199,16 +122,8 @@
 
 <div class="page" id="page">
   <img src="/HUNT.png" alt="BLACKOUT HUNT" class="logo-img" id="logoEl" />
-
   <h1 id="titleEl">VOCÊ<br>VENCEU!</h1>
-
-  <div class="card-wrap" id="cardWrap">
-    <video id="cardVideo" autoplay loop muted playsinline preload="auto">
-      <source src="/assets/card-video.webm" type="video/webm" />
-      <source src="/assets/card-video.mp4" type="video/mp4" />
-    </video>
-  </div>
-
+  <canvas id="card3d"></canvas>
   <div class="bottom-info">
     <div class="winner-name" id="winnerName">—</div>
     <div class="winner-insta" id="winnerInsta"></div>
@@ -218,45 +133,132 @@
   </div>
 </div>
 
+<!-- THREE.JS — enxuto, sem OrbitControls -->
+<script type="module">
+  import * as THREE from 'three';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-<!-- CONFETTI -->
+  const canvas = document.getElementById('card3d');
+
+  function sz() {
+    const r = canvas.getBoundingClientRect();
+    return { w: r.width || 280, h: r.height || 280 };
+  }
+
+  const { w, h } = sz();
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+  // Pixel ratio máximo 1 em mobile — grande ganho de performance
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
+  renderer.setSize(w, h);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.8;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
+
+  // === 3 LUZES APENAS ===
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+  const key = new THREE.DirectionalLight(0xccff44, 3.5);
+  key.position.set(2, 3, 4);
+  scene.add(key);
+
+  const neon = new THREE.PointLight(0xaaff00, 6, 8);
+  neon.position.set(-1, 0, 3);
+  scene.add(neon);
+
+  new GLTFLoader().load('/assets/card3d.gltf', (gltf) => {
+    const model = gltf.scene;
+
+    model.traverse((child) => {
+      if (child.isMesh && child.material) {
+        child.material.envMapIntensity = 1.5;
+        child.material.needsUpdate = true;
+      }
+    });
+
+    // Centralizar anchor point
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size   = box.getSize(new THREE.Vector3());
+    model.position.sub(center);
+    camera.position.z = Math.max(size.x, size.y, size.z) * 2.1;
+    scene.add(model);
+
+    // Travar ângulo vertical: inclinação fixa, só gira no Y
+    model.rotation.x = 0.12; // leve tilt para mostrar a face do card
+
+    let t = 0;
+    // Throttle a 40fps para poupar CPU
+    const MS_PER_FRAME = 1000 / 40;
+    let last = 0;
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+      if (now - last < MS_PER_FRAME) return;
+      last = now;
+      t += 0.018;
+
+      model.rotation.y += 0.018;          // gira suavemente no eixo Y
+      model.position.y = Math.sin(t) * 0.06; // float suave
+      neon.intensity = 5 + Math.sin(t * 1.8) * 2; // pulso leve
+
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
+  }, undefined, (err) => console.error('GLTF:', err));
+
+  window.addEventListener('resize', () => {
+    const { w, h } = sz();
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  });
+</script>
+
+<!-- CONFETTI — throttled a 30fps, 80 peças -->
 <script>
 (function() {
   const c = document.getElementById('confetti');
   const ctx = c.getContext('2d');
-  function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
+  function resize() { c.width = innerWidth; c.height = innerHeight; }
   resize();
   window.addEventListener('resize', resize);
 
-  const colors = ['#aaff00','#ccff00','#ffffff','#ffd700','#00ffcc','#ffee00','#aaffaa'];
-  const pieces = Array.from({ length: 160 }, () => ({
-    x: Math.random() * window.innerWidth,
-    y: Math.random() * window.innerHeight - window.innerHeight,
-    w: Math.random() * 12 + 4,
-    h: Math.random() * 6 + 3,
+  const colors = ['#aaff00','#ccff00','#ffffff','#ffd700','#00ffcc','#ffee00'];
+  const pieces = Array.from({ length: 80 }, () => ({
+    x: Math.random() * innerWidth,
+    y: Math.random() * innerHeight - innerHeight,
+    w: Math.random() * 11 + 4, h: Math.random() * 5 + 3,
     color: colors[Math.floor(Math.random() * colors.length)],
-    speed: Math.random() * 3 + 0.8,
+    speed: Math.random() * 2.5 + 0.7,
     angle: Math.random() * Math.PI * 2,
-    spin: (Math.random() - 0.5) * 0.14,
-    drift: (Math.random() - 0.5) * 1.5,
-    opacity: Math.random() * 0.45 + 0.5,
+    spin: (Math.random() - 0.5) * 0.12,
+    drift: (Math.random() - 0.5) * 1.2,
+    opacity: Math.random() * 0.4 + 0.5,
   }));
 
-  (function draw() {
+  const MS = 1000 / 30;
+  let last = 0;
+  (function draw(now) {
+    requestAnimationFrame(draw);
+    if (now - last < MS) return;
+    last = now;
     ctx.clearRect(0, 0, c.width, c.height);
-    pieces.forEach(p => {
+    for (const p of pieces) {
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.angle);
-      ctx.fillStyle = p.color;
       ctx.globalAlpha = p.opacity;
+      ctx.fillStyle = p.color;
       ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
       ctx.restore();
       p.y += p.speed; p.x += p.drift; p.angle += p.spin;
       if (p.y > c.height) { p.y = -12; p.x = Math.random() * c.width; }
-    });
-    requestAnimationFrame(draw);
-  })();
+    }
+  })(0);
 })();
 </script>
 
@@ -278,10 +280,10 @@
 <!-- DESKTOP REARRANGE -->
 <script>
   if (window.innerWidth >= 700) {
-    const page = document.getElementById('page');
-    const logo = document.getElementById('logoEl');
-    const title = document.getElementById('titleEl');
-    const wrap = document.getElementById('cardWrap');
+    const page   = document.getElementById('page');
+    const logo   = document.getElementById('logoEl');
+    const title  = document.getElementById('titleEl');
+    const card   = document.getElementById('card3d');
     const bottom = document.querySelector('.bottom-info');
 
     const left = document.createElement('div');
@@ -290,7 +292,7 @@
 
     const right = document.createElement('div');
     right.className = 'right-col';
-    right.append(wrap);
+    right.append(card);
 
     page.innerHTML = '';
     page.append(left, right);
