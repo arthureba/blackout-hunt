@@ -58,7 +58,7 @@
 
     #card3d {
       flex: 1; display: block;
-      width: min(300px, 78vw);
+      width: min(220px, 58vw);
       min-height: 0;
     }
 
@@ -89,7 +89,7 @@
       .logo-img { max-width: 200px; width: 18vw; }
       h1 { font-size: clamp(3rem, 6.5vw, 5rem); text-align: left; }
       .right-col { flex-shrink: 0; }
-      #card3d { width: min(360px, 40vw); flex: unset; }
+      #card3d { width: min(300px, 34vw); flex: unset; }
       .bottom-info { text-align: left; }
     }
   </style>
@@ -163,7 +163,7 @@
     const center = box.getCenter(new THREE.Vector3());
     const size   = box.getSize(new THREE.Vector3());
     model.position.sub(center); // anchor no centro
-    camera.position.z = Math.max(size.x, size.y, size.z) * 2.1;
+    camera.position.z = Math.max(size.x, size.y, size.z) * 3.0;
     scene.add(model);
 
     let t = 0;
