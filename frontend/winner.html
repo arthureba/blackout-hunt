@@ -23,74 +23,169 @@
 
     .glow-bg {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background:
-        radial-gradient(ellipse 55% 55% at 50% 52%, rgba(170,255,0,0.08) 0%, transparent 70%),
-        radial-gradient(ellipse 30% 20% at 50% 52%, rgba(255,215,0,0.06) 0%, transparent 50%);
+      background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(170,255,0,0.07) 0%, transparent 70%);
     }
 
+    /* ─── LAYOUT PRINCIPAL ─── */
     .page {
       position: relative; z-index: 1;
       height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: space-between;
-      padding-top: max(env(safe-area-inset-top), 0.7rem);
-      padding-bottom: max(env(safe-area-inset-bottom), 0.7rem);
-      padding-left: 1rem; padding-right: 1rem;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
+    /* ─── FAIXAS DE FOTO ─── */
+    .strip-wrap {
+      flex-shrink: 0;
+      overflow: hidden;
+      /* Fade nas bordas esquerda/direita */
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+      mask-image:         linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+    }
+
+    .strip-wrap.top {
+      padding-top: max(env(safe-area-inset-top), 0.6rem);
+      padding-bottom: 0.4rem;
+    }
+
+    .strip-wrap.bottom {
+      padding-top: 0.4rem;
+      padding-bottom: max(env(safe-area-inset-bottom), 0.6rem);
+    }
+
+    .strip-track {
+      display: flex;
+      gap: 10px;
+      width: max-content;
+      animation: goLeft 30s linear infinite;
+    }
+
+    .strip-track.rev {
+      animation: goRight 30s linear infinite;
+    }
+
+    @keyframes goLeft  { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @keyframes goRight { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+
+    .photo-card {
+      width: 110px;
+      height: 144px;
+      border-radius: 14px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #111;
+    }
+
+    .photo-card img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      pointer-events: none;
+    }
+
+    /* ─── CENTRO ─── */
+    .center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      min-height: 0;
+      padding: 0.4rem 1rem;
+      position: relative;
+    }
+
+    /* Suave fade no topo e base do centro para fundir com as faixas */
+    .center::before, .center::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 48px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .center::before { top: 0;    background: linear-gradient(to bottom, #0a0a0a, transparent); }
+    .center::after  { bottom: 0; background: linear-gradient(to top,    #0a0a0a, transparent); }
+
+    /* ─── LOGO ─── */
     .logo-img {
-      max-width: 140px; width: 35vw; height: auto; flex-shrink: 0;
+      width: min(130px, 32vw);
+      height: auto;
       filter: drop-shadow(0 0 8px rgba(170,255,0,0.4));
+      flex-shrink: 0;
     }
 
+    /* ─── TÍTULO ─── */
     h1 {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2.4rem, 12vw, 4rem);
-      letter-spacing: 0.05em; color: #aaff00;
-      line-height: 1; text-align: center; flex-shrink: 0;
+      font-size: clamp(2rem, 10vw, 3.5rem);
+      letter-spacing: 0.05em;
+      color: #aaff00;
+      line-height: 0.95;
+      text-align: center;
+      flex-shrink: 0;
       animation: glowPulse 2.5s ease-in-out infinite;
     }
 
     @keyframes glowPulse {
-      0%, 100% { text-shadow: 0 0 18px rgba(170,255,0,0.5); }
-      50%       { text-shadow: 0 0 40px rgba(170,255,0,0.95), 0 0 80px rgba(170,255,0,0.3); }
+      0%, 100% { text-shadow: 0 0 16px rgba(170,255,0,0.55); }
+      50%       { text-shadow: 0 0 38px rgba(170,255,0,0.95), 0 0 70px rgba(170,255,0,0.3); }
     }
 
+    /* ─── CARD 3D ─── */
     #card3d {
-      flex: 1; display: block;
-      width: min(220px, 58vw);
-      min-height: 0;
+      display: block;
+      width: min(190px, 50vw);
+      aspect-ratio: 1;
+      flex-shrink: 0;
     }
 
-    .bottom-info { text-align: center; flex-shrink: 0; }
-
+    /* ─── INFO VENCEDOR ─── */
     .winner-name {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(1.3rem, 6vw, 2rem);
-      color: #fff; letter-spacing: 0.04em; line-height: 1.1;
+      font-size: clamp(1.1rem, 5vw, 1.7rem);
+      color: #fff;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      text-align: center;
     }
-    .winner-insta { font-size: 0.8rem; color: #aaff00; margin-top: 0.1rem; }
-    .winner-time  { font-size: 0.65rem; color: #555; margin-top: 0.1rem; margin-bottom: 0.5rem; }
-    .subtitle     { font-size: 0.65rem; color: #444; line-height: 1.6; margin-bottom: 0.5rem; }
+    .winner-insta { font-size: 0.75rem; color: #aaff00; }
+    .winner-time  { font-size: 0.6rem;  color: #555; margin-bottom: 0.1rem; }
 
     .btn-back {
       display: inline-block;
-      font-family: 'Space Mono', monospace; font-size: 0.65rem;
-      font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
-      padding: 0.45rem 1.2rem; border: 1px solid #333;
-      background: transparent; color: #555; border-radius: 4px;
-      text-decoration: none; transition: all 0.15s;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0.4rem 1rem;
+      border: 1px solid #2a2a2a;
+      background: transparent; color: #555;
+      border-radius: 4px; text-decoration: none;
+      transition: all 0.15s;
     }
     .btn-back:hover { border-color: #aaff00; color: #aaff00; }
 
+    /* ─── DESKTOP ─── */
     @media (min-width: 700px) and (min-height: 500px) {
-      .page { flex-direction: row; justify-content: center; align-items: center; gap: 4rem; padding: 2rem 4rem; }
-      .left-col { display: flex; flex-direction: column; align-items: flex-start; gap: 0.6rem; flex: 1; max-width: 340px; }
-      .logo-img { max-width: 200px; width: 18vw; }
-      h1 { font-size: clamp(3rem, 6.5vw, 5rem); text-align: left; }
-      .right-col { flex-shrink: 0; }
-      #card3d { width: min(300px, 34vw); flex: unset; }
-      .bottom-info { text-align: left; }
+      .photo-card { width: 150px; height: 190px; border-radius: 18px; }
+      .strip-track { gap: 14px; }
+
+      .center { flex-direction: row; gap: 4rem; justify-content: center; padding: 0 3rem; }
+      .center::before { display: none; }
+      .center::after  { display: none; }
+
+      .left-col {
+        display: flex; flex-direction: column;
+        align-items: flex-start; gap: 0.4rem;
+        max-width: 320px;
+      }
+
+      .logo-img { width: min(180px, 18vw); }
+      h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); text-align: left; }
+      .winner-name { text-align: left; }
+
+      #card3d { width: min(280px, 32vw); }
     }
   </style>
 </head>
@@ -99,97 +194,122 @@
 <div class="glow-bg"></div>
 
 <div class="page" id="page">
-  <img src="/HUNT.png" alt="BLACKOUT HUNT" class="logo-img" id="logoEl" />
-  <h1 id="titleEl">VOCÊ<br>VENCEU!</h1>
-  <canvas id="card3d"></canvas>
-  <div class="bottom-info">
+
+  <!-- Faixa topo (rola para a esquerda) -->
+  <div class="strip-wrap top">
+    <div class="strip-track" id="stripTop"></div>
+  </div>
+
+  <!-- Conteúdo central -->
+  <div class="center" id="center">
+    <img src="/HUNT.png" alt="BLACKOUT HUNT" class="logo-img" id="logoEl" />
+    <h1 id="titleEl">VOCÊ<br>VENCEU!</h1>
+    <canvas id="card3d"></canvas>
     <div class="winner-name" id="winnerName">—</div>
     <div class="winner-insta" id="winnerInsta"></div>
     <div class="winner-time" id="winnerTime"></div>
-    <p class="subtitle">Primeiro a completar os 4 checkpoints.<br>O prêmio é seu!</p>
     <a href="/" class="btn-back">← Ver Ranking</a>
   </div>
+
+  <!-- Faixa base (rola para a direita) -->
+  <div class="strip-wrap bottom">
+    <div class="strip-track rev" id="stripBottom"></div>
+  </div>
+
 </div>
 
+<!-- FOTOS -->
+<script>
+const PHOTOS = [
+  '/assets/photos/p1.jpg',
+  '/assets/photos/p2.jpg',
+  '/assets/photos/p3.jpg',
+  '/assets/photos/p4.jpg',
+  '/assets/photos/p5.jpg',
+  '/assets/photos/p6.jpg',
+  '/assets/photos/p7.jpg',
+  '/assets/photos/p8.jpg',
+  '/assets/photos/p9.jpg',
+  '/assets/photos/p10.jpg',
+  '/assets/photos/p11.jpg',
+  '/assets/photos/p12.jpg',
+];
+
+function buildStrip(el, photos) {
+  // Triplicar para garantir loop suave mesmo em telas largas
+  const all = [...photos, ...photos, ...photos];
+  el.innerHTML = all.map(src =>
+    `<div class="photo-card"><img src="${src}" alt="" loading="eager" decoding="async" /></div>`
+  ).join('');
+}
+
+buildStrip(document.getElementById('stripTop'),    PHOTOS);
+buildStrip(document.getElementById('stripBottom'), [...PHOTOS].reverse());
+</script>
+
+<!-- THREE.JS — leve -->
 <script type="module">
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
   const canvas = document.getElementById('card3d');
-  function sz() { const r = canvas.getBoundingClientRect(); return { w: r.width || 300, h: r.height || 300 }; }
+  function sz() { const r = canvas.getBoundingClientRect(); return { w: r.width || 190, h: r.height || 190 }; }
   const { w, h } = sz();
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1)); // cap em 1 = maior ganho mobile
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
   renderer.setSize(w, h);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.8;
 
-  const scene = new THREE.Scene();
+  const scene  = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
 
-  // 3 luzes — ambiente + key verde + neon point
   scene.add(new THREE.AmbientLight(0xffffff, 0.65));
-
   const key = new THREE.DirectionalLight(0xccff44, 3.5);
   key.position.set(2, 3, 3);
   scene.add(key);
-
   const neon = new THREE.PointLight(0xaaff00, 7, 8);
   neon.position.set(0, 0, 2.5);
   scene.add(neon);
 
   const controls = new OrbitControls(camera, canvas);
-  controls.enableZoom = false;
-  controls.enablePan  = false;
-  controls.autoRotate = true;
-  controls.autoRotateSpeed = 2.5;
-  // Trava rotação vertical — só gira de lado pra lado
+  controls.enableZoom = false; controls.enablePan = false;
+  controls.autoRotate = true; controls.autoRotateSpeed = 2.5;
   controls.minPolarAngle = Math.PI / 2.8;
   controls.maxPolarAngle = Math.PI / 2.8;
 
   new GLTFLoader().load('/assets/card3d.gltf', (gltf) => {
     const model = gltf.scene;
-    model.traverse((child) => {
-      if (child.isMesh && child.material) {
-        child.material.envMapIntensity = 1.5;
-        child.material.needsUpdate = true;
-      }
+    model.traverse(c => {
+      if (c.isMesh && c.material) { c.material.envMapIntensity = 1.5; c.material.needsUpdate = true; }
     });
-
-    const box  = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    const size   = box.getSize(new THREE.Vector3());
-    model.position.sub(center); // anchor no centro
+    const box = new THREE.Box3().setFromObject(model);
+    model.position.sub(box.getCenter(new THREE.Vector3()));
+    const size = box.getSize(new THREE.Vector3());
     camera.position.z = Math.max(size.x, size.y, size.z) * 3.0;
     scene.add(model);
 
     let t = 0;
-    const MS = 1000 / 30; // 30fps — suave e econômico
+    const MS = 1000 / 30;
     let last = 0;
-
-    function animate(now) {
-      requestAnimationFrame(animate);
+    function tick(now) {
+      requestAnimationFrame(tick);
       if (now - last < MS) return;
-      last = now;
-      t += 0.02;
-
+      last = now; t += 0.02;
       model.position.y = Math.sin(t) * 0.07;
-      neon.intensity    = 6 + Math.sin(t * 1.8) * 2;
-
+      neon.intensity = 6 + Math.sin(t * 1.8) * 2;
       controls.update();
       renderer.render(scene, camera);
     }
-    requestAnimationFrame(animate);
-  }, undefined, (e) => console.error('GLTF:', e));
+    requestAnimationFrame(tick);
+  }, undefined, e => console.error('GLTF:', e));
 
   window.addEventListener('resize', () => {
     const { w, h } = sz();
-    renderer.setSize(w, h);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
+    renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
   });
 </script>
 
@@ -210,19 +330,23 @@
 
 <!-- DESKTOP REARRANGE -->
 <script>
-  if (window.innerWidth >= 700) {
-    const page   = document.getElementById('page');
-    const logo   = document.getElementById('logoEl');
-    const title  = document.getElementById('titleEl');
-    const card   = document.getElementById('card3d');
-    const bottom = document.querySelector('.bottom-info');
-    const left   = document.createElement('div'); left.className = 'left-col';
-    const right  = document.createElement('div'); right.className = 'right-col';
-    left.append(logo, title, bottom);
-    right.append(card);
-    page.innerHTML = '';
-    page.append(left, right);
-  }
+if (window.innerWidth >= 700) {
+  const center = document.getElementById('center');
+  const logo   = document.getElementById('logoEl');
+  const title  = document.getElementById('titleEl');
+  const card   = document.getElementById('card3d');
+  const name   = document.getElementById('winnerName');
+  const insta  = document.getElementById('winnerInsta');
+  const time   = document.getElementById('winnerTime');
+  const btn    = document.querySelector('.btn-back');
+
+  const left = document.createElement('div');
+  left.className = 'left-col';
+  left.append(logo, title, name, insta, time, btn);
+
+  center.innerHTML = '';
+  center.append(left, card);
+}
 </script>
 
 </body>
