@@ -21,12 +21,7 @@
       overflow: hidden;
     }
 
-    #confetti {
-      position: fixed; inset: 0;
-      pointer-events: none; z-index: 0;
-    }
-
-    .glow-bg {
+.glow-bg {
       position: fixed; inset: 0; z-index: 0;
       background:
         radial-gradient(ellipse 55% 55% at 50% 52%, rgba(170,255,0,0.10) 0%, transparent 70%),
@@ -117,7 +112,6 @@
 </head>
 <body>
 
-<canvas id="confetti"></canvas>
 <div class="glow-bg"></div>
 
 <div class="page" id="page">
@@ -218,49 +212,6 @@
   });
 </script>
 
-<!-- CONFETTI — throttled a 30fps, 80 peças -->
-<script>
-(function() {
-  const c = document.getElementById('confetti');
-  const ctx = c.getContext('2d');
-  function resize() { c.width = innerWidth; c.height = innerHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-
-  const colors = ['#aaff00','#ccff00','#ffffff','#ffd700','#00ffcc','#ffee00'];
-  const pieces = Array.from({ length: 80 }, () => ({
-    x: Math.random() * innerWidth,
-    y: Math.random() * innerHeight - innerHeight,
-    w: Math.random() * 11 + 4, h: Math.random() * 5 + 3,
-    color: colors[Math.floor(Math.random() * colors.length)],
-    speed: Math.random() * 2.5 + 0.7,
-    angle: Math.random() * Math.PI * 2,
-    spin: (Math.random() - 0.5) * 0.12,
-    drift: (Math.random() - 0.5) * 1.2,
-    opacity: Math.random() * 0.4 + 0.5,
-  }));
-
-  const MS = 1000 / 30;
-  let last = 0;
-  (function draw(now) {
-    requestAnimationFrame(draw);
-    if (now - last < MS) return;
-    last = now;
-    ctx.clearRect(0, 0, c.width, c.height);
-    for (const p of pieces) {
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.angle);
-      ctx.globalAlpha = p.opacity;
-      ctx.fillStyle = p.color;
-      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-      ctx.restore();
-      p.y += p.speed; p.x += p.drift; p.angle += p.spin;
-      if (p.y > c.height) { p.y = -12; p.x = Math.random() * c.width; }
-    }
-  })(0);
-})();
-</script>
 
 <!-- WINNER DATA -->
 <script>
