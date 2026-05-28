@@ -1173,10 +1173,21 @@ async function adminDeactivate(step) {
   }
 }
 
-function downloadLeads() {
+async function downloadLeads() {
   const secret = getAdminSecret();
   if (!secret) { showToast('Informe o admin secret', 'error'); return; }
-  window.location.href = `/admin/leads.csv?x-admin-secret=${encodeURIComponent(secret)}`;
+  try {
+    const res = await fetch(`${API_BASE}/admin/leads.csv`, {
+      headers: { 'x-admin-secret': secret },
+    });
+    if (!res.ok) { showToast('Não autorizado', 'error'); return; }
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'leads-blackout-hunt.csv';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  } catch(e) { showToast('Erro ao baixar CSV', 'error'); }
 }
 
 async function adminResetAll() {

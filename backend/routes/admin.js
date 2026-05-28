@@ -15,7 +15,8 @@ function formatMs(ms) {
 }
 
 function adminAuth(req, res, next) {
-  const secret = req.headers['x-admin-secret'] || req.query['x-admin-secret'];
+  // Somente via header — query param vaza em logs de URL e histórico do browser
+  const secret = req.headers['x-admin-secret'];
   if (!secret || secret !== process.env.ADMIN_SECRET) {
     return res.status(401).json({ ok: false, error: 'Não autorizado' });
   }
