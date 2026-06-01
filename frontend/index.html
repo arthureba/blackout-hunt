@@ -866,6 +866,21 @@ function getMyId() {
   try { return localStorage.getItem('bh_user_id'); } catch (_) { return null; }
 }
 
+// ─── Geolocalização ─────────────────────────────────────────────────────────────
+function getLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject({ code: 2, message: 'Geolocalização não suportada' });
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0,
+    });
+  });
+}
+
 // ─── Scan ─────────────────────────────────────────────────────────────────────
 async function doScan() {
   const name = document.getElementById('fName').value.trim();
@@ -885,13 +900,32 @@ async function doScan() {
 
   const btn = document.getElementById('btnScan');
   btn.disabled = true;
+  btn.textContent = 'LOCALIZANDO...';
+
+  // ── Captura GPS (geofencing) ──
+  let coords = { lat: null, lng: null };
+  try {
+    const pos = await getLocation();
+    coords.lat = pos.coords.latitude;
+    coords.lng = pos.coords.longitude;
+  } catch (geoErr) {
+    btn.disabled = false;
+    btn.textContent = 'REGISTRAR CHECKPOINT';
+    if (geoErr.code === 1) {
+      showToast('Você precisa permitir a localização para registrar o checkpoint.', 'error');
+    } else {
+      showToast('Não foi possível obter sua localização. Tente novamente.', 'error');
+    }
+    return;
+  }
+
   btn.textContent = 'ENVIANDO...';
 
   try {
     const res = await fetch(`${API_BASE}/scan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ step: currentStep, name, email, phone, instagram }),
+      body: JSON.stringify({ step: currentStep, name, email, phone, instagram, lat: coords.lat, lng: coords.lng }),
     });
 
     const data = await res.json();

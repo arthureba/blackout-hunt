@@ -1,9 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const CHECKPOINTS = require('../config/checkpoints');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[\d\s\-().]{7,20}$/;
+
+// Distância em metros entre dois pontos GPS (fórmula de Haversine)
+function distanceMeters(lat1, lng1, lat2, lng2) {
+  const R = 6371000; // raio da Terra em metros
+  const toRad = (d) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxMtwRLnjr3-B2FfST4Le20SsingGQpTBB6qnmlgiFvvzxf8DOkbPBTy6OWgBu0iyhNcQ/exec';
 
@@ -54,12 +67,36 @@ function buildUserPayload(user, thisStep) {
 }
 
 router.post('/', async (req, res) => {
-  const { step, name, email, phone, instagram } = req.body;
+  const { step, name, email, phone, instagram, lat, lng } = req.body;
 
   // Validate step
   const stepNum = parseInt(step, 10);
   if (!stepNum || stepNum < 1 || stepNum > 4) {
     return res.status(400).json({ ok: false, error: 'step deve ser entre 1 e 4' });
+  }
+
+  // ── GEOFENCING — só aceita scan se estiver fisicamente no local ──
+  const geo = CHECKPOINTS[stepNum];
+  if (geo && geo.enabled) {
+    const userLat = parseFloat(lat);
+    const userLng = parseFloat(lng);
+
+    if (!Number.isFinite(userLat) || !Number.isFinite(userLng)) {
+      return res.status(422).json({
+        ok: false,
+        error: 'Ative a localização do seu celular para registrar este checkpoint.',
+        needLocation: true,
+      });
+    }
+
+    const dist = distanceMeters(userLat, userLng, geo.lat, geo.lng);
+    if (dist > geo.radiusMeters) {
+      return res.status(403).json({
+        ok: false,
+        error: 'Você precisa estar no local do checkpoint para registrar. Aproxime-se do QR Code físico.',
+        tooFar: true,
+      });
+    }
   }
 
   // Validate required fields
