@@ -3,16 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const db = require('../db');
-
-function formatMs(ms) {
-  if (ms == null) return '';
-  const totalCs = Math.floor(ms / 10);
-  const cs = totalCs % 100;
-  const totalSec = Math.floor(totalCs / 100);
-  const sec = totalSec % 60;
-  const min = Math.floor(totalSec / 60);
-  return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
-}
+const { formatMs } = require('../utils/formatTime');
 
 function adminAuth(req, res, next) {
   // Somente via header — query param vaza em logs de URL e histórico do browser

@@ -1,16 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-
-function formatMs(ms) {
-  if (ms == null) return null;
-  const totalCs = Math.floor(ms / 10);
-  const cs = totalCs % 100;
-  const totalSec = Math.floor(totalCs / 100);
-  const sec = totalSec % 60;
-  const min = Math.floor(totalSec / 60);
-  return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
-}
+const { formatMs } = require('../utils/formatTime');
 
 router.get('/', async (req, res) => {
   try {
