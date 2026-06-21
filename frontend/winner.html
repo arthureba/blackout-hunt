@@ -10,239 +10,285 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      height: 100%; width: 100%;
-      background: #080808;
-      overflow: hidden;
+      min-height: 100%;
+      background: #050505;
+      color: #e6e6e6;
       font-family: 'Space Mono', monospace;
-      color: #e0e0e0;
+      overflow-x: hidden;
     }
 
-    /* ── ARC CONTAINER ── */
-    #arc {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
+    /* brilho de fundo */
+    .glow-bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 45% at 50% 42%, rgba(170,255,0,0.10) 0%, transparent 68%),
+        radial-gradient(ellipse 40% 30% at 50% 80%, rgba(170,255,0,0.04) 0%, transparent 60%);
     }
 
-    .arc-photo {
-      position: absolute;
-      top: 0; left: 0;
-      width: 92px; height: 120px;
-      border-radius: 14px;
-      overflow: hidden;
-      background: #111;
-      will-change: transform, opacity;
-      transition: opacity 0.3s;
+    /* vinheta escura nas bordas */
+    .vignette {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(ellipse 90% 90% at 50% 50%, transparent 55%, rgba(0,0,0,0.7) 100%);
     }
 
-    .arc-photo img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      display: block;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    /* ── CONTEÚDO CENTRAL ── */
-    .center {
-      position: relative;
-      z-index: 1;
-      height: 100vh;
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      padding: max(env(safe-area-inset-top), 1rem) 2rem max(env(safe-area-inset-bottom), 1rem);
-      text-align: center;
-      pointer-events: none;
+      gap: 1.4rem;
+      padding: max(env(safe-area-inset-top), 2rem) 1.4rem max(env(safe-area-inset-bottom), 2rem);
     }
 
     .logo-img {
-      width: min(150px, 38vw);
+      width: min(150px, 40vw);
       height: auto;
       filter: drop-shadow(0 0 12px rgba(170,255,0,0.45));
-      margin-bottom: 0.5rem;
+      opacity: 0;
+      animation: fadeDown 1s ease 0.2s forwards;
     }
 
-    h1 {
+    /* ─── CARTÃO ÉPICO ─── */
+    .card {
+      position: relative;
+      width: min(440px, 92vw);
+      background: linear-gradient(160deg, #0e0e0e 0%, #080808 100%);
+      border: 1px solid rgba(170,255,0,0.35);
+      border-radius: 18px;
+      padding: 2.2rem 1.8rem 2rem;
+      box-shadow:
+        0 0 0 1px rgba(170,255,0,0.06),
+        0 20px 60px rgba(0,0,0,0.7),
+        0 0 60px rgba(170,255,0,0.12);
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(24px);
+      animation:
+        cardIn 1.1s cubic-bezier(0.22,1,0.36,1) 0.5s forwards,
+        float 5s ease-in-out 1.6s infinite;
+    }
+
+    /* cantos decorativos */
+    .card::before, .card::after {
+      content: '';
+      position: absolute;
+      width: 26px; height: 26px;
+      border: 2px solid #aaff00;
+      opacity: 0.7;
+    }
+    .card::before { top: 12px; left: 12px; border-right: none; border-bottom: none; border-top-left-radius: 8px; }
+    .card::after  { bottom: 12px; right: 12px; border-left: none; border-top: none; border-bottom-right-radius: 8px; }
+
+    .card.clicked {
+      animation: cardIn 0.1s forwards;
+      transform: translateY(0);
+      cursor: default;
+      border-color: rgba(170,255,0,0.6);
+      box-shadow:
+        0 0 0 1px rgba(170,255,0,0.1),
+        0 20px 60px rgba(0,0,0,0.7),
+        0 0 90px rgba(170,255,0,0.25);
+    }
+
+    .crest {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(3rem, 16vw, 5.5rem);
-      letter-spacing: 0.05em;
+      font-size: 0.78rem;
+      letter-spacing: 0.45em;
       color: #aaff00;
-      line-height: 1;
-      animation: glowPulse 2.5s ease-in-out infinite;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      padding-left: 0.45em;
     }
 
-    @keyframes glowPulse {
-      0%, 100% { text-shadow: 0 0 20px rgba(170,255,0,0.55); }
-      50%       { text-shadow: 0 0 45px rgba(170,255,0,1), 0 0 90px rgba(170,255,0,0.35); }
+    .card h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.6rem, 11vw, 3.6rem);
+      letter-spacing: 0.03em;
+      line-height: 0.95;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 1.2rem;
+      text-shadow: 0 0 30px rgba(170,255,0,0.3);
+    }
+
+    .epic {
+      font-size: 0.86rem;
+      line-height: 1.85;
+      color: #cfcfcf;
+      text-align: center;
+    }
+
+    .epic p { margin-bottom: 0.9rem; }
+    .epic .hl { color: #aaff00; font-weight: 700; }
+    .epic .prize {
+      display: block;
+      margin-top: 0.4rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.08em;
+      color: #aaff00;
+      text-shadow: 0 0 24px rgba(170,255,0,0.5);
     }
 
     .divider {
-      width: 40px; height: 1px;
-      background: #333;
-      margin: 0.25rem 0;
+      width: 50px; height: 2px;
+      background: linear-gradient(to right, transparent, #aaff00, transparent);
+      margin: 1.2rem auto 0;
+      opacity: 0.6;
     }
 
-    .winner-name {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(1.4rem, 7vw, 2.2rem);
-      color: #fff;
-      letter-spacing: 0.06em;
-      line-height: 1.1;
-    }
-
-    .winner-insta {
-      font-size: 0.8rem;
-      color: #aaff00;
-      letter-spacing: 0.03em;
-    }
-
-    .winner-time {
-      font-size: 0.62rem;
-      color: #444;
-      margin-top: -0.15rem;
-    }
-
-    .btn-back {
-      pointer-events: all;
-      display: inline-block;
-      margin-top: 0.5rem;
-      font-family: 'Space Mono', monospace;
+    /* dica de toque */
+    .tap-hint {
+      margin-top: 1rem;
       font-size: 0.65rem;
-      font-weight: 700;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      padding: 0.5rem 1.4rem;
-      border: 1px solid #2a2a2a;
-      background: transparent;
-      color: #555;
-      border-radius: 4px;
-      text-decoration: none;
-      transition: border-color 0.15s, color 0.15s;
+      color: #888;
+      text-align: center;
+      animation: blink 1.8s ease-in-out infinite;
     }
-    .btn-back:hover { border-color: #aaff00; color: #aaff00; }
+    .card.clicked .tap-hint { display: none; }
+
+    /* ─── BOTÃO REIVINDICAR ─── */
+    .claim-wrap {
+      height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .claim-wrap.show {
+      height: auto;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .btn-claim {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.08em;
+      color: #050505;
+      background: #aaff00;
+      border: none;
+      border-radius: 10px;
+      padding: 1rem 2.4rem;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 0 40px rgba(170,255,0,0.45);
+      animation: pulseBtn 1.8s ease-in-out infinite;
+      transition: transform 0.12s ease;
+    }
+    .btn-claim:active { transform: scale(0.96); }
+
+    .claim-sub {
+      margin-top: 0.7rem;
+      font-size: 0.62rem;
+      color: #777;
+      letter-spacing: 0.05em;
+      text-align: center;
+    }
+
+    /* ─── ANIMAÇÕES ─── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes cardIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-12px); }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 0.4; }
+      50%      { opacity: 1; }
+    }
+    @keyframes pulseBtn {
+      0%, 100% { box-shadow: 0 0 30px rgba(170,255,0,0.35); }
+      50%      { box-shadow: 0 0 55px rgba(170,255,0,0.75); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card { animation: cardIn 0.6s ease 0.3s forwards; }
+    }
   </style>
 </head>
 <body>
 
-<!-- Arco de fotos -->
-<div id="arc"></div>
+<div class="glow-bg"></div>
+<div class="vignette"></div>
 
-<!-- Conteúdo central -->
-<div class="center">
+<div class="page">
   <img src="/HUNT.png" alt="BLACKOUT HUNT" class="logo-img" />
-  <h1>VOCÊ VENCEU!</h1>
-  <div class="divider"></div>
-  <div class="winner-name" id="winnerName">—</div>
-  <div class="winner-insta" id="winnerInsta"></div>
-  <div class="winner-time"  id="winnerTime"></div>
-  <a href="/" class="btn-back">← Retornar ao Ranking</a>
+
+  <div class="card" id="card">
+    <div class="crest">★ CAÇADOR LENDÁRIO ★</div>
+    <h1 id="cardTitle">VOCÊ VENCEU</h1>
+
+    <div class="epic">
+      <p>A jornada chegou ao fim.</p>
+      <p>Quatro pontos. Quatro provas. Quatro vezes em que o mais fácil
+         seria parar — e <span class="hl">você seguiu</span>.</p>
+      <p>Enfrentou o frio que mordia, a chuva que insistia, a cidade que
+         tentou te perder no caminho. Deixou para trás cada adversário que
+         sonhou em chegar onde <span class="hl">você chegou primeiro</span>.</p>
+      <p>Não foi sorte. Foi vontade. Foi não desistir quando ninguém
+         estava olhando.</p>
+      <p>Hoje seu nome ocupa o ponto mais alto do ranking — o trono que
+         muitos disputam e <span class="hl">só um conquista</span>.</p>
+      <p>Você caçou. Você venceu. Você é digno.</p>
+
+      <div class="divider"></div>
+      <p style="margin-top:1rem; margin-bottom:0;">O prêmio mais valioso da caçada agora é seu:</p>
+      <span class="prize">⚡ UMA BLACKOUT BULL ⚡</span>
+    </div>
+
+    <div class="tap-hint">▸ toque para reivindicar ◂</div>
+  </div>
+
+  <div class="claim-wrap" id="claimWrap">
+    <a class="btn-claim" id="btnClaim"
+       href="https://chat.whatsapp.com/E3JtEBWW16O9hyabsUuBGo?mode=gi_t"
+       target="_blank" rel="noopener">⚡ REIVINDICAR PRÊMIO</a>
+    <div class="claim-sub">Avise no grupo que você foi o primeiro a coletar o cartão.</div>
+  </div>
 </div>
 
-<!-- WINNER DATA -->
 <script>
-(async function() {
-  try {
-    const data = await (await fetch('/ranking')).json();
-    const w = data.ranking.find(u => u.is_winner);
-    if (w) {
-      document.getElementById('winnerName').textContent = w.name;
-      if (w.instagram) document.getElementById('winnerInsta').textContent = w.instagram;
-      document.getElementById('winnerTime').textContent = 'Tempo total: ' + w.total_time_formatted;
-    }
-  } catch(e) {}
-})();
-</script>
+  const card      = document.getElementById('card');
+  const claimWrap = document.getElementById('claimWrap');
+  let revealed = false;
 
-<!-- ARCO DE FOTOS -->
-<script>
-(function() {
-  const PHOTOS = [
-    '/assets/photos/p1.jpg',  '/assets/photos/p2.jpg',
-    '/assets/photos/p3.jpg',  '/assets/photos/p4.jpg',
-    '/assets/photos/p5.jpg',  '/assets/photos/p6.jpg',
-    '/assets/photos/p7.jpg',  '/assets/photos/p8.jpg',
-    '/assets/photos/p9.jpg',  '/assets/photos/p10.jpg',
-    '/assets/photos/p11.jpg', '/assets/photos/p12.jpg',
-    '/assets/photos/p13.jpg', '/assets/photos/p14.jpg',
-    '/assets/photos/p15.jpg', '/assets/photos/p16.jpg',
-  ];
-
-  const container = document.getElementById('arc');
-  const PW = 92, PH = 120; // photo card dimensions
-
-  // Cria elementos de foto
-  const els = PHOTOS.map(src => {
-    const div = document.createElement('div');
-    div.className = 'arc-photo';
-    const img = document.createElement('img');
-    img.src = src; img.alt = ''; img.draggable = false;
-    div.appendChild(img);
-    container.appendChild(div);
-    return div;
-  });
-
-  const N = els.length;
-  let offset = 0;
-  let last = 0;
-  const MS = 1000 / 30; // 30fps
-
-  // Ângulos em graus (estilo relógio: 0=topo, 90=direita, 180=baixo, 270=esquerda)
-  const GAP_CENTER = 180;  // gap no centro-baixo
-  const GAP_HALF   = 38;   // metade do gap em graus (~76° total)
-  const ARC_DEG    = 360 - GAP_HALF * 2; // ~284° de arco visível
-  const ARC_START  = GAP_CENTER + GAP_HALF; // onde o arco começa (sentido horário)
-
-  function render(now) {
-    requestAnimationFrame(render);
-    if (now - last < MS) return;
-    last = now;
-
-    offset = (offset + 0.00022) % 1; // velocidade de rotação
-
-    const W = window.innerWidth;
-    const H = window.innerHeight;
-    const CX = W / 2;
-    const CY = H * 0.44;
-    const RX = Math.min(W * 0.56, 340);
-    const RY = Math.min(H * 0.50, 400);
-
-    els.forEach((el, i) => {
-      // t = posição normalizada [0,1] de cada foto ao longo do arco
-      const t = ((i / N) + offset) % 1;
-
-      // Ângulo no arco (graus, estilo relógio)
-      const angleDeg = (ARC_START + t * ARC_DEG) % 360;
-
-      // Converter para radianos cartesianos (0=direita, anti-horário, y invertido)
-      const rad = (angleDeg - 90) * Math.PI / 180;
-
-      const x = CX + RX * Math.cos(rad);
-      const y = CY + RY * Math.sin(rad);
-
-      // Escala: maior no topo (angleDeg≈0), menor nas bordas
-      const distFromTop = Math.min(angleDeg, 360 - angleDeg) / 180;
-      const scale = 0.62 + 0.38 * (1 - distFromTop);
-
-      // Leve rotação seguindo a tangente do arco
-      const tilt = (angleDeg - 90) * 0.12;
-
-      // Fade nas extremidades do arco (perto do gap)
-      const distFromGapL = Math.abs(((angleDeg - (GAP_CENTER - GAP_HALF) + 360) % 360));
-      const distFromGapR = Math.abs(((angleDeg - (GAP_CENTER + GAP_HALF) + 360) % 360));
-      const minDist = Math.min(distFromGapL, distFromGapR);
-      const opacity  = Math.min(minDist / 28, 1);
-
-      el.style.transform = `translate(${x - PW/2}px, ${y - PH/2}px) rotate(${tilt}deg) scale(${scale})`;
-      el.style.opacity = opacity;
-    });
+  function reveal() {
+    if (revealed) return;
+    revealed = true;
+    card.classList.add('clicked');
+    claimWrap.classList.add('show');
+    // rola suave até o botão
+    setTimeout(() => {
+      claimWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 250);
   }
 
-  requestAnimationFrame(render);
-})();
+  card.addEventListener('click', reveal);
+
+  // Personaliza com o nome do vencedor (se houver)
+  (async function() {
+    try {
+      const data = await (await fetch('/ranking')).json();
+      const w = data.ranking.find(u => u.is_winner);
+      if (w && w.name) {
+        const first = w.name.trim().split(' ')[0].toUpperCase();
+        document.getElementById('cardTitle').textContent = `${first}, VOCÊ VENCEU`;
+      }
+    } catch (e) {}
+  })();
 </script>
 
 </body>
